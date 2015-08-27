@@ -778,7 +778,10 @@ def ext_part1():
 	if game.player.command in ["look at window", "look out window", "window"]:
 		print("You sigh and gaze out the window.")
 	elif game.player.command in ["look at guard", "analyse guard", "guard"]:
-		print("You notice the guard has something in his pocket. As he walks, it seems to be within your reach.")
+		if game.player.stolen:
+			print("You snicker a little as you notice the guard's empty pocket.")
+		else:
+			print("You notice the guard has something in his pocket. As he walks, it seems to be within your reach.")
 	elif game.player.command in ["bash head into wall", "bang head into wall", "bang head against wall", "bash head against wall"]:
 		damage = 5
 		damagemsg = "You bashed your head into the wall out of misery. It hurts a little. You lost %s health."
