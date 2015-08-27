@@ -344,6 +344,17 @@ class Enemy():
 
 no_enemy = Enemy("None", 0)
 
+class Unlocked_areas():
+	def __init__(self):
+		self.dracordlair		= False
+		self.forest				= False
+		self.swamp				= False
+		self.mountains			= False
+		self.mine				= False
+		self.river				= False
+
+areas = Unlocked_areas()
+		
 class Game():
 	def __init__(self):
 		self.player = Player("Player")
