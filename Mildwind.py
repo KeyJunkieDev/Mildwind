@@ -22,6 +22,9 @@ hMMMMMMMM| dm' /NMMMMMMN |MMMMMMMs  	Creative, Nagger, Tester, and Reviser
     -dNMMMMMMMMMMMMMMMMMMMMd/`      
       ``-\oshdNMMMMMMMMMMd:         	Version
                `-\+shmNh:           	''' + version + '''
+
+Mildwind by Keyboard Junkie Dev Team is licensed under a Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License.
 '''
 
 #logging
