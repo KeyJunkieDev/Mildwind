@@ -1538,7 +1538,7 @@ def en_part15():
 	game.set_current_enemy(no_enemy)
 	
 def ext_part15():
-	
+	show_entry_message()
 
 def part15():
 	game.player.savepos = part15
