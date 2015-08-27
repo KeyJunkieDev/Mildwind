@@ -1486,6 +1486,8 @@ def end():
 		input("Thank you for playing my game!")
 		sys.exit()
 
+#============================================challenge mode============================================
+		
 if not os.path.exists("saves"):
 	os.makedirs("saves")
 
@@ -1495,6 +1497,20 @@ print("\n")
 
 choose_name()
 
+'''
+def game_mode_select():
+	while True:
+		choice = input("Chose a game mode. (Entering nothing automatically selects story mode)\n Story\n Challenge/Endless Mode\n Options")
+		if choice in ["", "story"]
+			story_start()
+		elif choice == "challenge":
+			challenge()
+		elif choice == "options":
+			options()
+		else:
+			print("Invalid entry./nChose a game mode. (Entering nothing automatically selects story mode)\n Story\n Challenge/Endless Mode\n Options")
+'''
+
 def tutorial_input():
 	choice = input("Would you like to play the tutorial first? (y/n)\n>").lower()
 	if choice == "y":
@@ -1502,6 +1518,7 @@ def tutorial_input():
 	else:
 		part1()
 
+#possibly subject to being a funtion
 try:
 	load()
 	print("Save version: " + game.player.version)
