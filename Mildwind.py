@@ -344,6 +344,17 @@ class Enemy():
 
 no_enemy = Enemy("None", 0)
 
+class Unlocked_areas():
+	def __init__(self):
+		self.dracordlair		= False
+		self.forest				= False
+		self.swamp				= False
+		self.mountains			= False
+		self.mine				= False
+		self.river				= False
+
+areas = Unlocked_areas()
+		
 class Game():
 	def __init__(self):
 		self.player = Player("Player")
@@ -1466,9 +1477,10 @@ def part15():
 	save()
 	en_part15()
 	log_stats("14")
-	game.player.randhint = []
+	game.player.randhint = ["Be sure to talk to Bruce if you need something."]
 	game.player.cmdext = ext_part14
-
+	print("===Redwind Village===")
+	#list of places to go to. I plan to have areas that unlock as you progress.
 
 #end
 def end():
@@ -1518,7 +1530,7 @@ def tutorial_input():
 	else:
 		part1()
 
-#possibly subject to being a funtion
+#possibly subject to being a function
 try:
 	load()
 	print("Save version: " + game.player.version)
