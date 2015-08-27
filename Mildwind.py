@@ -1228,22 +1228,11 @@ def ext_part8():
 		else:
 			print("You don't have a shield.")
 	elif game.player.command in ["attack", "fight"]:
-		if enemy.dead:
-			print("You stare at a dead, faceless version of yourself.")
-		else:   
-			enemy.health = enemy.health - (game.player.attack / enemy.armor)
-			if enemy.health <= 0:
-				enemy.kill()
-				game.player.armor = game.player.armorbank
-				game.player.give_item(Potion.medium, 2)
-				game.player.give_item(Item.scroll)
-				print("You attacked the doppelganger. He is now dead, and you have a health of %s. You also picked up 2 medium potions and scroll." % (game.player.gethealth()))
-			else:
-				remove_shield()
-				damage = random.choice(enemy.attack)
-				damagemsg = "The doppelganger learned your moves and attacked you. Your health is now %s."
-				deathmsg = "You were killed."
-				game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
+		game.player.attack_enemy(game.current_enemy)
+		if game.current_enemy.dead:
+			game.player.armor = game.player.armorbank
+		else:
+			remove_shield()
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		esattack = [0, 15, 20, 45, 50, 60]
 		randomdmg = random.choice(esattack)
@@ -1279,14 +1268,20 @@ def part8():
 
 #part9
 def en_part9():
-	global enemy
-	enemy = Enemy("Fanged Giant Spider", 500, [10, 20, 30], "N/A")
+	spider = Enemy("Fanged Giant Spider", 500, [10, 20, 30])
+	spider.rewards = [(Potion.super, 1)]
+	spider.deadmsg = "You stare at the dead spider and watch it twitch."
+	spider.killedmsg = "You attacked the spider. She has been squashed, and you have a health of {0}. You also picked up a super potion."
+	spider.damagemsg = "You attacked the spider, but she poisoned you a bit. She has a health of {0}, and you have a health of {1}."
+	spider.deathmsg = "You were killed."
+	spider.ending = ""
+	game.set_current_enemy(spider)
 	
 def ext_part9():
 	if game.player.command == "shield":
 		if game.player.hasshield:
 			if enemy.dead:
-				print("You stare at a dead spider.")
+				print("You stare at the dead spider and watch it twitch.")
 			else:
 				if game.player.stamina <= 0:
 					print("You don't have enough stamina.")
@@ -1317,23 +1312,13 @@ def ext_part9():
 		else:
 			print("You don't have a shield.")
 	elif game.player.command in ["attack", "fight"]:
-		if enemy.dead:
-			print("You stare at the dead spider and watch it twitch.")
+		game.player.attack_enemy(game.current_enemy)
+		if game.current_enemy.dead:
+			game.player.armor = game.player.armorbank
 		else:
 			remove_shield()
-			enemy.health -= game.player.attack
-			if enemy.health <= 0:
-				enemy.kill()
-				game.player.armor = game.player.armorbank
-				game.player.sppotions += 1
-				print("You attacked the spider. She has been squashed, and you have a health of %s. You also picked up a super potion." % (game.player.gethealth()))
-			else:
-				remove_shield()
-				game.player.maxhealth -= 5
-				damage = random.choice(enemy.attack)
-				damagemsg = "You attacked the spider, but she poisoned you a bit. She has a health of %s, and you have a health of %s. Your max health is now %s."
-				deathmsg = "You were killed."
-				game.player.hurt(damage, True, damagemsg % (enemy.health, game.player.gethealth(), game.player.maxhealth), deathmsg)
+			game.player.maxhealth -= 5
+			print("Your max health is now %s." % (game.player.maxhealth))
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		esattack = [0, 15, 20, 45, 50, 60]
 		randomdmg = random.choice(esattack)
@@ -1395,8 +1380,8 @@ def part10():
 
 #part11	
 def en_part11():
-	global enemy
-	enemy = Enemy("Dracord", 5000, [35, 40, 45], 10)
+	dracord = Enemy("Dracord", 5000, [35, 40, 45], 10)
+	game.set_current_enemy(dracord)
 
 def ext_part11():
 	dracord_hint = "HINT: It looks like this battle can't be fought alone..."
