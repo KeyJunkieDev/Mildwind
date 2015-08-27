@@ -223,19 +223,20 @@ class Player():
 	def get_attack_damage(self):
 		return self.weapon.damage() + self.extattack
 
-	def attack_enemy(self, enemy):
+	def attack_enemy(self, enemy, giveshielduse=True):
 		if enemy.dead:
 			print(enemy.deadmsg)
 		else:
-			enemy.hurt(self.get_attack_damage())
+			enemy.hurt(self.get_attack_damage() / enemy.armor)
 			if enemy.dead:
 				self.give_items(enemy.rewards)
 				print(enemy.killedmsg.format(self.gethealth()))
 			else:
 				damage = enemy.random_attack()
 				self.hurt(damage, True, enemy.damagemsg.format(enemy.health, "{1}"), enemy.deathmsg, enemy.ending)
-				if (self.shielduse > 0):
-					self.shielduse -= 1
+				if giveshielduse:
+					if (self.shielduse > 0):
+						self.shielduse -= 1
 
 	def use_shield(self, enemy):
 		if game.player.shield is not Shield.none:
@@ -247,15 +248,13 @@ class Player():
 				else:
 					if game.player.shielduse >= 2:
 						damage = enemy.random_attack()
-						learnedmsg = "The {0} has learned your moves and attacked you. Your health is now {1}."
-						self.hurt(damage, True, learnedmsg.format(enemy.name.lower(), "{1}"), enemy.deathmsg)
+						self.hurt(damage, True, enemy.learnedmsg.format("{1}"), enemy.deathmsg)
 					else:
 						game.player.stamina -= 1
 						game.player.shielduse += 1
 						if game.random_chance(self.shield.chance()):
 							damage = enemy.random_attack() / 2
-							reachmsg = "The {0} was able to reach over your shield and stab you a bit. Your health is now {1}."
-							self.hurt(damage, True, reachmsg.format(enemy.name.lower(), "{1}"), enemy.deathmsg)
+							self.hurt(damage, True, enemy.reachmsg.format("{1}"), enemy.deathmsg)
 						else:
 							enemy.hurt(self.shield.damage() / enemy.armor)
 							self.heal(10)
@@ -341,8 +340,12 @@ class Enemy():
 		self.killedmsg			= "The %s is dead." % (self.name.lower())
 		self.damagemsg  		= "You attack the %s." % (self.name.lower())
 		self.deathmsg   		= "You were killed."
+
 		self.shieldkilledmsg 	= "You safely deflect the enemy's attacks and kill it."
 		self.shieldmsg			= "You deflect the enemy's attack and it hurts itself in the process. You used some of your stamina."
+		self.learnedmsg			= "The %s learned your moves and attacked you. Your health is now {0}" % (self.name.lower())
+		self.reachmsg			= "The %s was able to reach over your shield and stab you a bit. Your health is now {0}" % (self.name.lower())
+
 		self.rundamagemsg		= "The %s attacked you." % (self.name.lower())
 		self.rundeathmsg		= "You were killed by the %s." % (self.name.lower())
 		self.runmsg				= "You escaped the %s." % (self.name.lower())
@@ -577,7 +580,7 @@ def show_help():
 			
 def show_cheats():
 	print("WARNING! Cheats could break your save!\n")
-	print("Armor\nmaxstamina\nStamfill\nMaxhealth\nHeal\nShieldreset\nDamage\nPotions\nHints\nEvents\nExit")
+	print("Maxstamina\nStamfill\nMaxhealth\nHeal\nPotions\nHints\nEvents\nExit")
 	game.player.cheated = True
 	while True:
 		cheatcmd = input("CHEATS>").lower()
@@ -1208,16 +1211,18 @@ def part7():
 
 #part8
 def en_part8():
-	doppelganger = Enemy(game.player.name, 50, (25, 25), 5)
+	doppelganger = Enemy(game.player.name, 50, (25, 26), 5)
 	doppelganger.rewards = [(Potion.medium, 2), (Item.scroll, 1)]
 
 	doppelganger.deadmsg = "You stare at a dead, faceless version of yourself."
 	doppelganger.killedmsg = "You attacked the doppelganger. He is now dead, and you have a health of {0}. You also picked up 2 medium potions and a scroll."
-	doppelganger.damagemsg = "The doppelganger learned your moves and attacked you. Your health is now {1}."
+	doppelganger.damagemsg = "You attacked the doppelganger. He has a health of {0}, and you have a health of {1}."
 	doppelganger.deathmsg = "You were killed."
 
 	doppelganger.shieldkilledmsg = "You safely deflected the doppelganger's attacks and killed him. Your health is now {0} and you obtained 2 medium potions and a scroll."
 	doppelganger.shieldmsg = "You deflected the doppelganger's attack and he hurt himself in the process. You used some of your stamina. His health is {0} and yours is {1}."
+	doppelganger.learnedmsg	= "The doppelganger learned your moves and attacked you. Your health is now {0}."
+	doppelganger.reachmsg = "The doppelganger was able to reach over your shield and stab you a bit. Your health is now {0}."
 
 	doppelganger.rundamagemsg = "The doppelganger backstabbed you. Your health is now {1}. You can't leave until it's dead."
 	doppelganger.rundeathmsg = "You killed yourself."
@@ -1229,7 +1234,7 @@ def ext_part8():
 	if game.player.command == "shield":
 		game.player.use_shield(game.current_enemy)
 	elif game.player.command in ["attack", "fight"]:
-		game.player.attack_enemy(game.current_enemy)
+		game.player.attack_enemy(game.current_enemy, False)
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
@@ -1249,7 +1254,8 @@ def part8():
 	game.player.cmdext = ext_part8
 	game.player.armorbank = game.player.armor
 	game.player.armor = Armor.prison_clothes
-	print("\nYou hear crying down the hall. When you turn down the corner, you spot a crying child. When you walk up to him and touch his shoulder, suddenly he grows to your size. When he turns around, he's faceless.\n\"I WANT YOUR FACE!\"\nA curse was casted on you. Your armor was dropped to 1.\nYou jump back. What now?")
+	print("\nYou hear crying down the hall. When you turn down the corner, you spot a crying child. When you walk up to him and touch his shoulder, suddenly he grows to your size. When he turns around, he's faceless.\n\"I WANT YOUR FACE!\"\nA curse was casted on you. You cannot use your armor.\nYou jump back. What now?")
+	game.player.shielduse = 1
 	commands()
 	
 
