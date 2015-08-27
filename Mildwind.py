@@ -1515,11 +1515,8 @@ def ext_part14():
 def part14():
 	game.player.savepos = part14
 	save()
-	en_part13()
+	en_part14()
 	log_stats("13")
-	game.player.randhint = []
-	game.player.stamina = game.player.maxstamina
-	game.player.shielduse = 0
 	game.player.cmdext = ext_part14
 	print("\nAfter a while of following the stream, you pass some bushes. You hear rustling from them when suddenly a pack of wolves jump out.")
 	time.sleep(.5)
@@ -1532,9 +1529,25 @@ def part14():
 	print("\nYou hear one last thud of a wolf hitting the ground. It begins to feel calm. You slow down and look behind you. The wolves have been shot by arrows.")
 	time.sleep(.5)
 	print("\nYou walk toward the village and meet a man holding a bow.")
+	print("\n\"You alright? You were nearly mauled by those wolves back there. Good thing I was about to go hunting. Stay for a while as you take a break. If you need info, come to my house. By the way, I'm Bruce.\"")
+	print("You are now in Redwind Village")
 	end()
 	
+#part15
+def en_part15():
+	game.set_current_enemy(no_enemy)
 	
+def ext_part15():
+	
+
+def part15():
+	game.player.savepos = part15
+	save()
+	en_part15()
+	log_stats("14")
+	game.player.randhint = []
+	game.player.cmdext = ext_part14
+
 
 #end
 def end():
