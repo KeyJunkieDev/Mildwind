@@ -3,6 +3,7 @@ from enum import Enum
 
 #version
 version = "Alpha 0.4.0.4 (Windows Edition)"
+experimental_version = False
 
 credits = '''
            :dNdhs+\-._              	=============< Mildwind >=============
@@ -40,9 +41,6 @@ logging.debug("If you are experiencing issues, or feel like some commands should
 -Finish help (again)
 -Randomized loot?
 -Achievements?
-
-!IMPORTANT!
--Inventory
 '''
 
 #intro
@@ -82,9 +80,8 @@ print("\n")
 print("The time is " + time.ctime())
 show_random_quote()
 print("\nVersion: %s\n" % (version))
-'''
-print("NOTE: THIS IS AN EXPERIMENTAL BUILD OF MILDWIND -PLEASE- TELL ME IF THERE ARE ANY PROBLEMS YOU COME PAST.\n")
-'''
+if experimental_version:
+	print("NOTE: THIS IS AN EXPERIMENTAL BUILD OF MILDWIND -PLEASE- TELL ME IF THERE ARE ANY PROBLEMS YOU COME PAST.\n")
 
 #variables
 help = "=< HELP >=\nObjective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.\n\nStats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Your strength is how strong you are. Potions are a limited resource that restore 40 health per use. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.\n\nCommon commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Uses a potion.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-Reload: Loads game from last save.\n-Exit, kill, quit, and close: Close the game."
@@ -119,14 +116,13 @@ class Armor(Enum):
 		return self.value[1]
 
 class Shield(Enum):
-    # (name, shield game.player.get_attack_damage() /, shield chance %)
 	none				= ("None", 0, 0)
 	wooden_shield		= ("Wooden Shield", 3, 25)
 
 	def name(self):
 		return self.value[0]
 
-	def shield(self):
+	def damage(self):
 		return self.value[1]
 
 	def chance(self):
@@ -193,6 +189,7 @@ class Player():
 		self.runner			= False
 		self.haswolf		= False
 
+		self.shielduse		= 0
 		self.cheated		= False
 		self.savepos		= []
 		self.randhint		= []
@@ -203,7 +200,7 @@ class Player():
 		return int(self.health)
 
 	def sethealth(self, health, damagemsg="", deathmsg="", ending=""):
-		self.health = health
+		self.health = int(health)
 		if (self.health > self.maxhealth):
 			self.health = self.maxhealth
 		if self.health <= 0:
@@ -236,7 +233,39 @@ class Player():
 				print(enemy.killedmsg.format(self.gethealth()))
 			else:
 				damage = random.choice(enemy.attack)
-				game.player.hurt(damage, True, enemy.damagemsg.format(enemy.health, "{1}"), enemy.deathmsg, enemy.ending)
+				self.hurt(damage, True, enemy.damagemsg.format(enemy.health, "{1}"), enemy.deathmsg, enemy.ending)
+				if (self.shielduse > 0):
+					self.shielduse -= 1
+
+	def use_shield(self, enemy):
+		if game.player.shield is not Shield.none:
+			if enemy.dead:
+				print(enemy.deadmsg)
+			else:
+				if self.stamina <= 0:
+					print("You don't have enough stamina.")
+				else:
+					if game.player.shielduse >= 2:
+						damage = random.choice(enemy.attack)
+						learnedmsg = "The {0} has learned your moves and attacked you. Your health is now {1}."
+						self.hurt(damage, True, learnedmsg.format(enemy.name.lower(), "{1}"), enemy.deathmsg)
+					else:
+						game.player.stamina -= 1
+						game.player.shielduse += 1
+						if game.random_chance(self.shield.chance()):
+							damage = random.choice(enemy.attack) / 2
+							reachmsg = "The {0} was able to reach over your shield and stab you a bit. Your health is now {1}."
+							self.hurt(damage, True, reachmsg.format(enemy.name.lower(), "{1}"), enemy.deathmsg)
+						else:
+							enemy.hurt(self.shield.damage() / enemy.armor)
+							self.heal(10)
+							if enemy.dead:
+								self.give_items(game.current_enemy.rewards)
+								print(enemy.shieldkilledmsg.format(self.gethealth()))
+							else:
+								print(enemy.shieldmsg.format(enemy.health, self.gethealth()))
+		else:
+			print("You don't have a shield.")
 
 	def getitem(self, item):
 		for invitem in self.inventory.items:
@@ -284,23 +313,25 @@ class Player():
 
 class Enemy():
 	def __init__(self, name="Enemy", health=100, attack=[5, 10, 15, 20], armor=1):
-		self.name		= name
-		self.health		= health
-		self.attack		= attack
-		self.armor		= armor
-		self.dead		= False
-		self.rewards    = []
-		self.deadmsg	= "You look at the dead %s." % (self.name)
-		self.killedmsg	= "The %s is dead." % (self.name)
-		self.damagemsg  = "You attack the %s." % (self.name)
-		self.deathmsg   = "You were killed."
-		self.ending     = ""
+		self.name				= name
+		self.health				= health
+		self.attack				= attack
+		self.armor				= armor
+		self.dead				= False
+		self.rewards    		= []
+		self.deadmsg			= "You look at the dead %s." % (self.name)
+		self.killedmsg			= "The %s is dead." % (self.name)
+		self.damagemsg  		= "You attack the %s." % (self.name)
+		self.deathmsg   		= "You were killed."
+		self.shieldkilledmsg 	= "You safely deflect the enemy's attacks and kill it."
+		self.shieldmsg			= "You deflect the enemy's attack and it hurts itself in the process. You used some of your stamina."
+		self.ending				= ""
 
 	def gethealth(self):
 		return int(self.health)
 
 	def sethealth(self, health):
-		self.health = health
+		self.health = int(health)
 		if self.health <= 0:
 			self.kill()
 
@@ -433,11 +464,7 @@ def use_potion(type):
 			game.player.heal(type.healing())
 		print("Potion used. Your health is now %s." % (game.player.gethealth()))
 		game.player.take_item(type, 1)
-	
-def remove_shield():
-	if game.player.hasshield and game.player.shielduse > 0:
-		game.player.shielduse -= 1
-	
+
 def show_player_stats():
 	def if_not_zero(statname, amount, maxamount):
 		if amount == 0 and maxamount == "" or amount == "[N/A]" or maxamount == 0:
@@ -1067,54 +1094,23 @@ def en_part6():
 	warrior = Enemy("Undead Warrior", 200, [15, 30, 45], 1.6)
 	warrior.rewards = [(Potion.small, 2), (Item.scroll, 1)]
 	warrior.deadmsg = "You gaze at the once-again dead soldier."
-	warrior.killedmsg = "You attacked the undead soldier. He is now in his previous state, and you have a health of {0}. You also picked up 2 small potions and scroll."
+	warrior.killedmsg = "You attacked the undead soldier. He is now in his previous state, and you have a health of {0}. You also picked up 2 small potions and a scroll."
 	warrior.damagemsg = "You attacked the undead soldier. The soldier has a health of {0}, and you have a health of {1}."
 	warrior.deathmsg = "You were killed."
+	warrior.shieldkilledmsg = "You safely deflected the soldier's attacks and killed him. Your health is now {0} and you obtained 2 small potions and a scroll."
+	warrior.shieldmsg = "You deflected the undead soldier's attack and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
 	warrior.ending = ""
 	game.set_current_enemy(warrior)
 
 def ext_part6():
 	if game.player.command == "shield":
-		if game.player.hasshield:
-			if enemy.dead:
-				print("You gaze at the once-again dead soldier.")
-			else:
-				if game.player.stamina <= 0:
-					print("You don't have enough stamina.")
-				else:
-					if game.player.shielduse >= 2:
-						damage = random.choice(enemy.attack)
-						damagemsg = "The soldier has learned your moves and attacked you. Your health is now %s."
-						deathmsg = "You have died."
-						game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
-					else:
-						game.player.stamina -= 1
-						game.player.shielduse += 1
-						shieldroll = random.choice(game.player.shieldchance)
-						if shieldroll == 0:
-							damage = random.choice(enemy.attack / 2)
-							damagemsg = "The soldier was able to reach over your shield and stab you a bit. Your health is now %s"
-							deathmsg = "You have died."
-							game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
-						else:
-							enemy.health -= game.player.shield / enemy.armor
-							game.player.heal(10)
-							if enemy.health <= 0:
-								enemy.kill()
-								game.player.give_items(game.current_enemy.rewards)
-								print("You safely deflected the soldier's attacks and killed him. Your health is now %s and you obtained 2 small potions and scroll." % (game.player.gethealth()))
-							else:
-								print("You deflected the undead soldier's attack and he hurt himself in the process. You used some of your stamina in the process. Your health is %s and his is %s." % (game.player.gethealth(), enemy.health))
-		else:
-			print("You don't have a shield.")
+		game.player.use_shield(game.current_enemy)
 	elif game.player.command in ["attack", "fight"]:
 		game.player.attack_enemy(game.current_enemy)
-		if not game.current_enemy.dead:
-			remove_shield()
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		esattack = [0, 15, 20, 45, 50, 60]
 		randomdmg = random.choice(esattack)
-		if enemy.health > 0:
+		if not game.current_enemy.dead:
 			if randomdmg == 0:
 				print("You escaped the undead soldier.")
 				part7()
@@ -1188,52 +1184,21 @@ def en_part8():
 	doppelganger = Enemy(game.player.name, 50, [25], 5)
 	doppelganger.rewards = [(Potion.medium, 2), (Item.scroll, 1)]
 	doppelganger.deadmsg = "You stare at a dead, faceless version of yourself."
-	doppelganger.killedmsg = "You attacked the doppelganger. He is now dead, and you have a health of {0}. You also picked up 2 medium potions and scroll."
+	doppelganger.killedmsg = "You attacked the doppelganger. He is now dead, and you have a health of {0}. You also picked up 2 medium potions and a scroll."
 	doppelganger.damagemsg = "The doppelganger learned your moves and attacked you. Your health is now {1}."
 	doppelganger.deathmsg = "You were killed."
+	doppelganger.shieldkilledmsg = "You safely deflected the doppelganger's attacks and killed him. Your health is now {0} and you obtained 2 medium potions and a scroll."
+	doppelganger.shieldmsg = "You deflected the doppelganger's attack and he hurt himself in the process. You used some of your stamina. His health is {0} and yours is {1}."
 	doppelganger.ending = ""
 	game.set_current_enemy(doppelganger)
 	
 def ext_part8():
 	if game.player.command == "shield":
-		if game.player.hasshield:
-			if enemy.dead:
-				print("You stare at a dead, faceless version of yourself.")
-			else:
-				if game.player.stamina <= 0:
-					print("You don't have enough stamina.")
-				else:
-					if game.player.shielduse >= 1:
-						damage = random.choice(enemy.attack)
-						damagemsg = "The doppelganger learned your moves and attacked you. Your health is now %s."
-						deathmsg = "You have died."
-						game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
-					else:
-						game.player.stamina -= 1
-						game.player.shielduse += 1
-						shieldroll = random.choice(game.player.shieldchance)
-						if shieldroll == 0:
-							damage = random.choice(enemy.attack)
-							damagemsg = "The doppelganger was able to reach over your shield and stab you a bit. Your health is now %s."
-							deathmsg = "You have died."
-							game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
-						else:
-							game.player.heal(10)
-							if enemy.health <= 0:
-								enemy.kill()
-								game.player.give_item(Potion.medium, 2)
-								game.player.give_item(Item.scroll)
-								print("You safely deflected the doppelganger's attacks and killed him. Your health is now %s and you obtained 2 medium potions and scroll." % (game.player.gethealth()))
-							else:
-								print("You deflected the doppelganger's attack and he hurt himself in the process. You used some of your stamina. Your health is %s and his is %s." % (game.player.gethealth(), enemy.health))
-		else:
-			print("You don't have a shield.")
+		game.player.use_shield(game.current_enemy)
 	elif game.player.command in ["attack", "fight"]:
 		game.player.attack_enemy(game.current_enemy)
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
-		else:
-			remove_shield()
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		esattack = [0, 15, 20, 45, 50, 60]
 		randomdmg = random.choice(esattack)
@@ -1275,49 +1240,19 @@ def en_part9():
 	spider.killedmsg = "You attacked the spider. She has been squashed, and you have a health of {0}. You also picked up a super potion."
 	spider.damagemsg = "You attacked the spider, but she poisoned you a bit. She has a health of {0}, and you have a health of {1}."
 	spider.deathmsg = "You were killed."
+	spider.shieldkilledmsg = "You safely deflected the spider's attacks and killed her. Your health is now {0} and you obtained a super potion."
+	spider.shieldmsg = "You deflected the spider's attack and she hurt herself in the process. You used some of your stamina in the process. Her health is {0} and yours is {1}."
 	spider.ending = ""
 	game.set_current_enemy(spider)
 	
 def ext_part9():
 	if game.player.command == "shield":
-		if game.player.hasshield:
-			if enemy.dead:
-				print("You stare at the dead spider and watch it twitch.")
-			else:
-				if game.player.stamina <= 0:
-					print("You don't have enough stamina.")
-				else:
-					if game.player.shielduse >= 2:
-						damage = random.choice(enemy.attack)
-						damagemsg = "The spider has learned your moves and attacked you. Your health is now %s."
-						deathmsg = "You have died."
-						game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
-					else:
-						game.player.stamina -= 1
-						game.player.shielduse += 1
-						shieldroll = random.choice(game.player.shieldchance)
-						if shieldroll == 0:
-							damage = random.choice(enemy.attack) / 2
-							damagemsg = "The spider was able to reach over your shield and stab you a bit. Your health is now %s."
-							deathmsg = "You have died."
-							game.player.hurt(damage, True, damagemsg % (game.player.gethealth()), deathmsg)
-						else:
-							enemy.health -= game.player.shield
-							game.player.heal(10)
-							if enemy.health <= 0:
-								enemy.kill()
-								game.player.sppotions += 1
-								print("You safely deflected the spider's attacks and killed her. Your health is now %s and you obtained a super potion." % (game.player.gethealth()))
-							else:
-								print("You deflected the spider's attack and she hurt herself in the process. You used some of your stamina in the process. Your health is %s and hers is %s." % (game.player.gethealth(), enemy.health))
-		else:
-			print("You don't have a shield.")
+		game.player.use_shield(game.current_enemy)
 	elif game.player.command in ["attack", "fight"]:
 		game.player.attack_enemy(game.current_enemy)
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
 		else:
-			remove_shield()
 			game.player.maxhealth -= 5
 			print("Your max health is now %s." % (game.player.maxhealth))
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
