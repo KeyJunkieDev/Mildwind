@@ -1178,14 +1178,11 @@ def part7():
 
 #part8
 def en_part8():
-	global enemy
-	enemy = Enemy(game.player.name, 50, [25], 5)
-
 	doppelganger = Enemy(game.player.name, 50, [25], 5)
 	doppelganger.rewards = [(Potion.medium, 2), (Item.scroll, 1)]
 	doppelganger.deadmsg = "You stare at a dead, faceless version of yourself."
-	doppelganger.killedmsg = "You attacked the undead soldier. He is now in his previous state, and you have a health of {0}. You also picked up 2 small potions and scroll."
-	doppelganger.damagemsg = "You attacked the undead soldier. The soldier has a health of {0}, and you have a health of {1}."
+	doppelganger.killedmsg = "You attacked the doppelganger. He is now dead, and you have a health of {0}. You also picked up 2 medium potions and scroll."
+	doppelganger.damagemsg = "The doppelganger learned your moves and attacked you. Your health is now {1}."
 	doppelganger.deathmsg = "You were killed."
 	doppelganger.ending = ""
 	game.set_current_enemy(doppelganger)
