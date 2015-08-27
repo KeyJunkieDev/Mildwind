@@ -191,9 +191,9 @@ class Player():
 		self.ruffindead		= False
 		self.headbanger		= False
 		self.runner			= False
+		self.haswolf		= False
 
 		self.cheated		= False
-		self.event			= ""
 		self.savepos		= []
 		self.randhint		= []
 		self.logging		= ""
@@ -325,6 +325,9 @@ class Game():
 
 	def set_start_time(self):
 		self.starttime = time.time()
+
+	def random_chance(self, percent):
+		return random.randrange(100) < percent
 
 game = Game()
 
@@ -931,8 +934,8 @@ def ext_part3():
 		else:
 			print("You don't have a torch.")
 	elif game.player.command in ["shake", "shake wolf off", "shake off wolf", "shake off"]:
-		if game.player.event == 0:
-			game.player.event = ""
+		if game.player.haswolf:
+			game.player.haswolf = False
 			print("You shook the wolf off your arm.")
 		else:
 			show_entry_message()
@@ -940,16 +943,14 @@ def ext_part3():
 		if game.current_enemy.dead:
 			print("You and Ruffin look at the dead wolf pack.")
 		else:
-			if game.player.event == 0:
+			if game.player.haswolf:
 				damagemsg = "The wolf is still stuck to your arm, you cannot attack. You lost some health in the process. Your health is now %s. Shake him off."
 				game.player.hurt(25, False, damagemsg % (game.player.gethealth()), "You bled to death.")
 			else:
 				game.player.attack_enemy(game.current_enemy)
-				if not game.current_enemy.dead:
-					eventrand = [0, 1, 2, 3, 4, 5]
-					game.player.event = random.choice(eventrand)
-					if game.player.event == 0:
-						game.player.hurt(15, "A wolf just locked its jaw onto your arm! You must shake it off to continue fighting. You lost 15 more health.")
+				if not game.current_enemy.dead and game.random_chance(16):
+					game.player.hurt(15, False, "A wolf just locked its jaw onto your arm! You must shake it off to continue fighting. You lost 15 more health.")
+					game.player.haswolf = True
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.current_enemy.health > 0:
 			print("\"%s, stop being a wuss and fight these puppies like a warrior!\" Ruffin yelled." % (game.player.name))
@@ -978,7 +979,7 @@ def part3():
 	game.player.randhint = ["Try to fight your way out.", "Once you've killed em off, maybe you can press forward.", "Wolves hate fire."]
 	game.player.cmdext = ext_part3
 	print("\nYou have chosen to follow Ruffin. On your way to the cave that Dracord resides in, you are stopped by a pack of wolves. \"Wolves! If I remember correctly, wolves are afraid of fire!\" Ruffin noted.")
-	game.player.event = ""
+	game.player.haswolf = False
 	commands()
 		
 #part4
