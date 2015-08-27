@@ -232,7 +232,7 @@ class Player():
 				self.give_items(enemy.rewards)
 				print(enemy.killedmsg.format(self.gethealth()))
 			else:
-				damage = random.choice(enemy.attack)
+				damage = enemy.random_attack()
 				self.hurt(damage, True, enemy.damagemsg.format(enemy.health, "{1}"), enemy.deathmsg, enemy.ending)
 				if (self.shielduse > 0):
 					self.shielduse -= 1
@@ -246,14 +246,14 @@ class Player():
 					print("You don't have enough stamina.")
 				else:
 					if game.player.shielduse >= 2:
-						damage = random.choice(enemy.attack)
+						damage = enemy.random_attack()
 						learnedmsg = "The {0} has learned your moves and attacked you. Your health is now {1}."
 						self.hurt(damage, True, learnedmsg.format(enemy.name.lower(), "{1}"), enemy.deathmsg)
 					else:
 						game.player.stamina -= 1
 						game.player.shielduse += 1
 						if game.random_chance(self.shield.chance()):
-							damage = random.choice(enemy.attack) / 2
+							damage = enemy.random_attack() / 2
 							reachmsg = "The {0} was able to reach over your shield and stab you a bit. Your health is now {1}."
 							self.hurt(damage, True, reachmsg.format(enemy.name.lower(), "{1}"), enemy.deathmsg)
 						else:
@@ -272,8 +272,11 @@ class Player():
 		if not enemy.dead:
 			randomdamage = random.choice(damage)
 			if (randomdamage > 0):
-				game.player.hurt(randomdamage, False, enemy.rundamagemsg, enemy.rundeathmsg, enemy.runending)
-				game.player.runfailed = True
+				self.hurt(randomdamage, False, enemy.rundamagemsg, enemy.rundeathmsg, enemy.runending)
+				if self.runfailed:
+					if enemy.runfailedmsg is not "":
+						print(enemy.runfailedmsg.format(self.name))
+				self.runfailed = True
 			else:
 				print(enemy.runmsg)
 				ran = True
@@ -327,7 +330,7 @@ class Player():
 				self.inventory.items.remove(self.getitem(item))
 
 class Enemy():
-	def __init__(self, name="Enemy", health=100, attack=[5, 10, 15, 20], armor=1):
+	def __init__(self, name="Enemy", health=100, attack=(5, 20), armor=1):
 		self.name				= name
 		self.health				= health
 		self.attack				= attack
@@ -343,7 +346,17 @@ class Enemy():
 		self.rundamagemsg		= "The %s attacked you." % (self.name.lower())
 		self.rundeathmsg		= "You were killed by the %s." % (self.name.lower())
 		self.runmsg				= "You escaped the %s." % (self.name.lower())
+		self.runfailedmsg		= ""
 		self.ending				= ""
+
+	def min_attack(self):
+		return self.attack[0]
+
+	def max_attack(self):
+		return self.attack[1]
+
+	def random_attack(self):
+		return random.randrange(self.min_attack(), self.max_attack())
 
 	def gethealth(self):
 		return int(self.health)
@@ -533,7 +546,7 @@ def show_player_stats():
 
 def show_enemy_stats():
 	enemy = game.current_enemy
-	print(enemy_stats % (enemy.name, enemy.health, enemy.attack[0], enemy.attack[len(enemy.attack) - 1], enemy.armor))
+	print(enemy_stats % (enemy.name, enemy.health, enemy.min_attack(), enemy.max_attack(), enemy.armor))
 	
 def show_help():
 	print("What would you like help with?\n\nYou can also press enter for a summary.\n")
@@ -826,7 +839,7 @@ def tutorial():
 	
 #part1
 def en_part1():
-	guard = Enemy("Guard", 100, [5, 10, 20, 45])
+	guard = Enemy("Guard", 100, (5, 45))
 	guard.rewards = [(Potion.medium, 1), (Potion.small, 1), (Item.torch, 1)]
 	guard.deadmsg = "You look at the dead guard."
 	guard.killedmsg = "The guard is dead, and you have a health of {0}. You also picked up 2 potions, a small one and a medium one. You continue to escape the dungeon. The halls are dark, so you grab a torch on your way out. As you escape, you are met by a man who stouts \"Follow me %s!\". You followed him." % (game.player.name)
@@ -972,7 +985,7 @@ def part2():
 	
 #part3
 def en_part3():
-	wolves = Enemy("Pack of wolves", 200, [1, 2, 5])
+	wolves = Enemy("Pack of wolves", 200, (1, 5))
 	wolves.rewards = [(Potion.small, 2)]
 
 	wolves.deadmsg = "You and Ruffin look at the dead wolf pack."
@@ -982,9 +995,11 @@ def en_part3():
 
 	wolves.rundamagemsg = "The wolves bit you in the back. Your health is now {1}. You can't leave until they are dead."
 	wolves.runmsg = "You and Ruffin escaped from the pack of wolves safely."
+	wolves.runfailedmsg = "\"{0}, stop being a wuss and fight these puppies like a warrior!\" Ruffin yelled."
 
 	wolves.ending = "THIS BITES!"
 	wolves.runending = "Manbaby"
+
 	game.set_current_enemy(wolves)
 
 def ext_part3():
@@ -1015,8 +1030,6 @@ def ext_part3():
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [0, 4, 10, 15, 20]):
 			part4()
-		if game.player.runfailed:
-			print("\"%s, stop being a wuss and fight these puppies like a warrior!\" Ruffin yelled." % (game.player.name))
 	else:
 		show_entry_message()
 		
@@ -1113,7 +1126,7 @@ def part5():
 
 #part6
 def en_part6():
-	warrior = Enemy("Undead Warrior", 200, [15, 30, 45], 1.6)
+	warrior = Enemy("Undead Warrior", 200, (15, 45), 1.6)
 	warrior.rewards = [(Potion.small, 2), (Item.scroll, 1)]
 	warrior.deadmsg = "You gaze at the once-again dead soldier."
 	warrior.killedmsg = "You attacked the undead soldier. He is now in his previous state, and you have a health of {0}. You also picked up 2 small potions and a scroll."
@@ -1150,7 +1163,7 @@ def part6():
 
 #part7
 def en_part7():
-	spectre = Enemy("Spectre", 666, ["YOU", "ARE"], "DEAD")
+	spectre = Enemy("Spectre", 666, ("YOU", "ARE"), "DEAD")
 	spectre.deathmsg = "DIE!!!"
 	spectre.ending = "..."
 
@@ -1195,7 +1208,7 @@ def part7():
 
 #part8
 def en_part8():
-	doppelganger = Enemy(game.player.name, 50, [25], 5)
+	doppelganger = Enemy(game.player.name, 50, (25, 25), 5)
 	doppelganger.rewards = [(Potion.medium, 2), (Item.scroll, 1)]
 
 	doppelganger.deadmsg = "You stare at a dead, faceless version of yourself."
@@ -1242,7 +1255,7 @@ def part8():
 
 #part9
 def en_part9():
-	spider = Enemy("Fanged Giant Spider", 500, [10, 20, 30])
+	spider = Enemy("Fanged Giant Spider", 500, (10, 30))
 	spider.rewards = [(Potion.super, 1)]
 
 	spider.deadmsg = "You stare at the dead spider and watch it twitch."
@@ -1320,7 +1333,7 @@ def part10():
 
 #part11	
 def en_part11():
-	dracord = Enemy("Dracord", 5000, [35, 40, 45], 10)
+	dracord = Enemy("Dracord", 5000, (35, 45), 10)
 	game.set_current_enemy(dracord)
 
 def ext_part11():

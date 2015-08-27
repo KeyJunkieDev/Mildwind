@@ -13,6 +13,7 @@ This game is currently in a very early state, there are only a few fully (probab
 Changelog
 0.4.0.4
 -Added inventory
+-Enemy damage is more random
 -Fixed crashes from 0.4.0.3
 -Fixed armor giving too much protection from some enemies
 -Fixed some enemies automatically starting the next part
