@@ -116,7 +116,7 @@ class Armor(Enum):
 		return self.value[1]
 
 class Shield(Enum):
-    # (name, shield game.player.attack /, shield chance %)
+    # (name, shield game.player.get_attack_damage() /, shield chance %)
 	none				= ("None", 0, 0)
 	wooden_shield		= ("Wooden Shield", 3, 25)
 
