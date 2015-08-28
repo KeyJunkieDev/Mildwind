@@ -84,7 +84,7 @@ if experimental_version:
 	print("NOTE: THIS IS AN EXPERIMENTAL BUILD OF MILDWIND -PLEASE- TELL ME IF THERE ARE ANY PROBLEMS YOU COME PAST.\n")
 
 #variables
-help = "=< HELP >=\nObjective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.\n\nStats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Your strength is how strong you are. Potions are a limited resource that restore 40 health per use. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.\n\nCommon commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Uses a potion.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-Reload: Loads game from last save.\n-Exit, kill, quit, and close: Close the game."
+help = "=< HELP >=\nObjective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.\n\nStats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Potions are a limited resource that restore 40 health per use. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.\n\nCommon commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Uses a potion.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-Reload: Loads game from last save.\n-Exit, kill, quit, and close: Close the game."
 
 player_stats = "=< STATS >=\nName: %s\nHealth: %s/%s\nItems:\n Weapon: %s \n Armor: %s \n Shield: %s\nArmor: %s\nWeapon Damage: %s\nAttack: %s\nStamina: %s/%s\nInventory:\n %s\nTime Played: %s"
 
@@ -906,7 +906,6 @@ def ext_part1():
 			game.player.give_item(Weapon.dagger)
 			game.player.give_item(Item.prison_key)
 			game.player.stolen = True
-			print("Strength increased to 2, you obtained a key, and a hint added.")
 	elif game.player.command in ["open door", "unlock door"]:
 		if game.player.has_item(Item.prison_key):
 			game.player.take_item(Item.prison_key)
@@ -972,9 +971,12 @@ def ext_part2():
 def part2():
 	game.player.savepos = part2
 	save()
-	log_stats("")
+	log_stats("1")
 	game.player.randhint = ["This is your chance you run free and be your own man.", "You could follow Ruffin on his quest."]
 	game.player.cmdext = ext_part2
+	game.player.extattack = 15
+	game.player.hasitems = False
+	game.player.stolen = False
 	print("\nYou just escaped the dungeon, you meet the man who helped you escape. \"%s, you are the world's only hope of defeating the dragon Dracord. Dracord has risen from the dead thanks to a curse casted upon the world. My name is Ruffin and the prophecy says that you can save humanity, that is why I saved you. Will you please follow me and help me defeat the dragon?\"" % (game.player.name))
 	if game.player.headbanger:
 		print("\"Also, what is up with your face? You look like you bashed your head into a wall.\"")
@@ -983,9 +985,7 @@ def part2():
 		game.player.maxhealth += 50
 		game.player.fullheal()
 		game.player.maxstamina += 5
-	game.player.extattack = 15
-	game.player.hasitems = False
-	game.player.stolen = False
+		game.player.extattack += 25
 	commands()
 	
 #part3
@@ -1096,7 +1096,7 @@ def en_part5():
 def ext_part5():
 	if game.player.command in ["dodge", "duck"]:
 		print("You dodged the incoming arrows as you ran to the end of the trap, but Ruffin...Ruffin was hit by an arrow in the stomach... He limped towards you, then leaned against the wall. You walk up to Ruffin. \"%s, I won't make it...you'll have to defeat Dracord without me... Here, take this...it will greatly assist you in your journey.\" He weakly handed you his broadsword...immediately after, his body collapsed.\nYou get up from your knees. You slowly progress further into the cave." % (game.player.name))
-		print("Your strength is now 5. Before you left Ruffin's lifeless body, you grabbed 2 medium potions from him. You also found a mysterious potion and drank it. Your max health increased.")
+		print("Before you left Ruffin's lifeless body, you grabbed 2 medium potions from him. You also found a mysterious potion and drank it. Your max health increased.")
 		game.player.ruffindead = True
 		game.player.extattack -= 15
 		game.player.give_item(Potion.medium, 2)
