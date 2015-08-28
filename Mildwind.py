@@ -41,6 +41,8 @@ logging.debug("If you are experiencing issues, or feel like some commands should
 -Finish help (again)
 -Randomized loot?
 -Achievements?
+-Integrate save manager and challenge mode
+-Options?
 '''
 
 #intro
