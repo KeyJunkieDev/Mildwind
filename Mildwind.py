@@ -932,6 +932,8 @@ def ext_part1_1():
 		part2()
 	elif game.player.command in ["attack", "fight"]:
 		game.player.attack_enemy(game.current_enemy)
+		if game.current_enemy.dead:
+			part2()
 	elif game.player.command in ["walk", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.current_enemy.dead:
 			part2()
