@@ -1489,6 +1489,11 @@ def ext_part15():
 	show_entry_message()
 
 def part15():
+	def available_areas(area, areaname):
+		if area:
+			print(areaname)
+		else:
+			pass
 	game.player.savepos = part15
 	save()
 	en_part15()
@@ -1496,6 +1501,12 @@ def part15():
 	game.player.randhint = ["Be sure to talk to Bruce if you need something."]
 	game.player.cmdext = ext_part14
 	print("===Redwind Village===")
+	available_areas(areas.dracordlair, "Dracord's Lair (Dracord)")
+	available_areas(areas.forest, "Forest")
+	available_areas(areas.swamp, "Swamp")
+	available_areas(areas.mountains, "Mountains")
+	available_areas(areas.mine, "Mine")
+	available_areas(areas.river, "River")
 	#list of places to go to. I plan to have areas that unlock as you progress.
 
 #end
