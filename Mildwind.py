@@ -868,7 +868,7 @@ def ext_part1():
 		ending = "Hopeless and Stupid"
 		game.player.headbanger = True
 		game.player.hurt(damage, False, damagemsg % (damage), deathmsg, ending)
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		print("You can't attack behind bars.")
 	elif game.player.command == "talk to prisoner":
 		if game.player.hasitems:
@@ -931,7 +931,7 @@ def ext_part1_1():
 	if game.player.command == "run":
 		print("As you run, a man comes from behind and kills the guard. The man says \"Follow me, %s!\", and you run to the exit." % (game.player.name))
 		part2()
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		game.player.attack_enemy(game.current_enemy)
 		if game.current_enemy.dead:
 			part2()
@@ -1022,7 +1022,7 @@ def ext_part3():
 			print("You shook the wolf off your arm.")
 		else:
 			show_entry_message()
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		if game.current_enemy.dead:
 			print("You and Ruffin look at the dead wolf pack.")
 		else:
@@ -1150,7 +1150,7 @@ def en_part6():
 def ext_part6():
 	if game.player.command == "shield":
 		game.player.use_shield(game.current_enemy)
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		game.player.attack_enemy(game.current_enemy)
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [0, 15, 20, 45, 50, 60]):
@@ -1237,7 +1237,7 @@ def en_part8():
 def ext_part8():
 	if game.player.command == "shield":
 		game.player.use_shield(game.current_enemy)
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		game.player.attack_enemy(game.current_enemy, False)
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
@@ -1283,7 +1283,7 @@ def en_part9():
 def ext_part9():
 	if game.player.command == "shield":
 		game.player.use_shield(game.current_enemy)
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		game.player.attack_enemy(game.current_enemy)
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
@@ -1322,7 +1322,7 @@ def ext_part10():
 			print("You look at the empty vase.")
 		else:
 			print("You look inside the vase. You found a few small potions.")
-			game.player.spotions = game.player.spotions + 2
+			game.player.give_item(Potion.small, 2)
 			game.player.hasitems = True
 	else:
 		show_entry_message()
@@ -1361,7 +1361,7 @@ def ext_part11():
 			game.player.ruffindead = True
 			input("Wake up (Press enter).")
 			part12()
-	elif game.player.command in ["attack", "fight"]:
+	elif game.player.command in ["attack", "fight", "a"]:
 		if game.player.ruffindead:
 			game.player.sethealth(0, "With no other option, you begin to charge towards Dracord without regret. Dracord slams you into the rocky walls and kills you.")
 			print(dracord_hint)
@@ -1467,19 +1467,19 @@ def part14():
 	log_stats("13")
 	game.player.cmdext = ext_part14
 	print("\nAfter a while of following the stream, you pass some bushes. You hear rustling from them when suddenly a pack of wolves jump out.")
-	time.sleep(.5)
+	time.sleep(10)
 	print("\nYou begin to run. As you are running, you start to see a small village in the distance, but you also hear growling and barking from behind.")
-	time.sleep(.5)
+	time.sleep(10)
 	print("\nYou hear a yelp from behind you but don't want to look back. You still hear angry wolves chasing you.")
-	time.sleep(.5)
+	time.sleep(10)
 	print("\nYou hear another cry from a wolf. It gets a bit quiet, but you still hear a wolf chasing you.")
-	time.sleep(.5)
+	time.sleep(10)
 	print("\nYou hear one last thud of a wolf hitting the ground. It begins to feel calm. You slow down and look behind you. The wolves have been shot by arrows.")
-	time.sleep(.5)
+	time.sleep(10)
 	print("\nYou walk toward the village and meet a man holding a bow.")
 	print("\n\"You alright? You were nearly mauled by those wolves back there. Good thing I was about to go hunting. Stay for a while as you take a break. If you need info, come to my house. By the way, I'm Bruce.\"")
 	print("You are now in Redwind Village")
-	end()
+	part15()
 	
 #part15
 def en_part15():
@@ -1501,12 +1501,14 @@ def part15():
 	game.player.randhint = ["Be sure to talk to Bruce if you need something."]
 	game.player.cmdext = ext_part14
 	print("===Redwind Village===")
-	available_areas(areas.dracordlair, "Dracord's Lair (Dracord)")
-	available_areas(areas.forest, "Forest")
-	available_areas(areas.swamp, "Swamp")
-	available_areas(areas.mountains, "Mountains")
-	available_areas(areas.mine, "Mine")
-	available_areas(areas.river, "River")
+	print("-Bruce's House (Bruce)")
+	available_areas(areas.dracordlair, "-Dracord's Lair (Dracord)")
+	available_areas(areas.forest, "-Forest")
+	available_areas(areas.swamp, "-Swamp")
+	available_areas(areas.mountains, "-Mountains")
+	available_areas(areas.mine, "-Mine")
+	available_areas(areas.river, "-River")
+	commands()
 	#list of places to go to. I plan to have areas that unlock as you progress.
 
 #end
