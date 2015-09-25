@@ -1479,27 +1479,27 @@ def part14():
 	print("\nYou walk toward the village and meet a man holding a bow.")
 	print("\n\"You alright? You were nearly mauled by those wolves back there. Good thing I was about to go hunting. Stay for a while as you take a break. If you need info, come to my house. By the way, I'm Bruce.\"")
 	print("You are now in Redwind Village")
-	part15()
+	redwind()
 	
-#part15
-def en_part15():
+#redwind
+def en_redwind():
 	game.set_current_enemy(no_enemy)
 	
-def ext_part15():
+def ext_redwind():
 	show_entry_message()
 
-def part15():
+def redwind():
 	def available_areas(area, areaname):
 		if area:
 			print(areaname)
 		else:
 			pass
-	game.player.savepos = part15
+	game.player.savepos = redwind
 	save()
-	en_part15()
+	en_redwind()
 	log_stats("14")
 	game.player.randhint = ["Be sure to talk to Bruce if you need something."]
-	game.player.cmdext = ext_part14
+	game.player.cmdext = ext_redwind
 	print("===Redwind Village===")
 	print("-Bruce's House (Bruce)")
 	available_areas(areas.dracordlair, "-Dracord's Lair (Dracord)")
@@ -1510,7 +1510,17 @@ def part15():
 	available_areas(areas.river, "-River")
 	commands()
 	#list of places to go to. I plan to have areas that unlock as you progress.
+'''
+def en_bruce():
 
+	
+def ext_bruce():
+	
+	
+def bruce():
+
+'''
+	
 #end
 def end():
 	print("To be continued...")
