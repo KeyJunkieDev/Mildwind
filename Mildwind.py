@@ -1486,7 +1486,10 @@ def en_redwind():
 	game.set_current_enemy(no_enemy)
 	
 def ext_redwind():
-	show_entry_message()
+	if game.player.command == "bruce":
+		bruce()
+	else:
+		show_entry_message()
 
 def redwind():
 	def available_areas(area, areaname):
@@ -1510,12 +1513,12 @@ def redwind():
 	available_areas(areas.river, "-River")
 	commands()
 	#list of places to go to. I plan to have areas that unlock as you progress.
-'''
+	
 def en_bruce():
 	game.set_current_enemy(no_enemy)
 	
 def ext_bruce():
-	if game.player.command in ["back", "return", "redwind"]
+	if game.player.command in ["back", "return", "redwind"]:
 		redwind()
 	else:
 		show_entry_message()
@@ -1529,8 +1532,24 @@ def bruce():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_bruce
-	print("(To leave, type "return")")
-'''
+	#print("(To leave, type "return")")
+	if areas.dracordlair == False:
+		print("\"So, you want to fight a dragon? Who sent you?\"")
+		time.sleep(2)
+		print("\"Ruffin? I know him! You must be the chosen one! Where is he anyway?\"")
+		time.sleep(5)
+		print("...")
+		time.sleep(3)
+		print("\"Oh... How sad... He was a great friend and ally...\"")
+		time.sleep(4)
+		print("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
+		time.sleep(5)
+		print("\"Farewell and good luck %s.\"" % (game.player.name))
+		areas.dracordlair = True
+		redwind()
+	else:
+		print("Bruce doesn't have anything to tell you.")
+		redwind()
 	
 #end
 def end():
