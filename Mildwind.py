@@ -1512,13 +1512,24 @@ def redwind():
 	#list of places to go to. I plan to have areas that unlock as you progress.
 '''
 def en_bruce():
-
+	game.set_current_enemy(no_enemy)
 	
 def ext_bruce():
-	
+	if game.player.command in ["back", "return", "redwind"]
+		redwind()
+	else:
+		show_entry_message()
 	
 def bruce():
-
+	game.player.savepos = bruce
+	save()
+	en_bruce()
+	log_stats("redwind")
+	game.player.randhint = ["What do you want? Talk to Bruce..."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_bruce
+	print("(To leave, type "return")")
 '''
 	
 #end
@@ -1538,6 +1549,12 @@ def end():
 		sys.exit()
 
 #============================================challenge mode============================================
+
+"""
+def options():
+	print("Commands:\n Save Manager\n Back\n>")
+
+"""
 		
 if not os.path.exists("saves"):
 	os.makedirs("saves")
@@ -1551,7 +1568,7 @@ choose_name()
 '''
 def game_mode_select():
 	while True:
-		choice = input("Chose a game mode. (Entering nothing automatically selects story mode)\n Story\n Challenge/Endless Mode\n Options")
+		choice = input("Chose a game mode. (Entering nothing automatically selects story mode).\n Story\n Challenge/Endless Mode\n Options\n>")
 		if choice in ["", "story"]
 			story_start()
 		elif choice == "challenge":
