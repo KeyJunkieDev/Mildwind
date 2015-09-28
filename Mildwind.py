@@ -161,6 +161,23 @@ class Inventory():
 		self.armors			= [Armor.prison_clothes]
 		self.shields		= [Shield.none]
 		self.items			= [InventoryItem(Item.scroll, 3)]
+		
+class Unlocked_areas():
+	def __init__(self):
+		self.dracordlair		= False
+		#Visit the first time to discover where the mine is.
+		#Fail to fight Dracord. Revived by Ruffin's ghost at Redwind. Visit Bruce.
+		#Fight with new sword, win.
+		self.forest				= False
+		#Gain access by talking to Bruce. Collect wood for a sword.
+		self.swamp				= False
+		#Bruce gives you map to swamp. Fight Giant Turtle, trolls, and Witch. Get key to fight Dracord.
+		self.mountains			= False
+		#Reveals that all the chores are to enchant powerful sword. Fight werewolves. Get to cave. Place sword and shield in enchanting pedestal.
+		self.mine				= False
+		#Visit to gather materials to make a powerful sword.
+		self.river				= False
+		#Bruce asks to find gold. Find powerful shield.
 
 class Player():
 	def __init__(self, name):
@@ -190,6 +207,7 @@ class Player():
 		self.headbanger		= False
 		self.runfailed		= False
 		self.haswolf		= False
+		self.visiteddracord = False
 
 		self.shielduse		= 0
 		self.cheated		= False
@@ -197,6 +215,8 @@ class Player():
 		self.randhint		= []
 		self.logging		= ""
 		self.cmdext			= ""
+		
+		self.areas			= Unlocked_areas()
 
 	def gethealth(self):
 		return int(self.health)
@@ -379,17 +399,6 @@ class Enemy():
 		self.dead = True
 
 no_enemy = Enemy("None", 0)
-
-class Unlocked_areas():
-	def __init__(self):
-		self.dracordlair		= False
-		self.forest				= False
-		self.swamp				= False
-		self.mountains			= False
-		self.mine				= False
-		self.river				= False
-
-areas = Unlocked_areas()
 		
 class Game():
 	def __init__(self):
@@ -1486,8 +1495,25 @@ def en_redwind():
 	game.set_current_enemy(no_enemy)
 	
 def ext_redwind():
+	def area_check(area, area_func):
+		if area:
+			area_func()
+		else:
+			show_entry_message()
 	if game.player.command == "bruce":
 		bruce()
+	elif game.player.command == "dracord":
+		area_check(game.player.areas.dracordlair, dracord)
+	elif game.player.command == "forest":
+		show_entry_message()
+	elif game.player.command == "swamp":
+		show_entry_message()
+	elif game.player.command == "mountains":
+		show_entry_message()
+	elif game.player.command == "mine":
+		show_entry_message()
+	elif game.player.command == "river":
+		show_entry_message()
 	else:
 		show_entry_message()
 
@@ -1505,12 +1531,12 @@ def redwind():
 	game.player.cmdext = ext_redwind
 	print("===Redwind Village===")
 	print("-Bruce's House (Bruce)")
-	available_areas(areas.dracordlair, "-Dracord's Lair (Dracord)")
-	available_areas(areas.forest, "-Forest")
-	available_areas(areas.swamp, "-Swamp")
-	available_areas(areas.mountains, "-Mountains")
-	available_areas(areas.mine, "-Mine")
-	available_areas(areas.river, "-River")
+	available_areas(game.player.areas.dracordlair, "-Dracord's Lair (Dracord)")
+	available_areas(game.player.areas.forest, "-Forest")
+	available_areas(game.player.areas.swamp, "-Swamp")
+	available_areas(game.player.areas.mountains, "-Mountains")
+	available_areas(game.player.areas.mine, "-Mine")
+	available_areas(game.player.areas.river, "-River")
 	commands()
 	#list of places to go to. I plan to have areas that unlock as you progress.
 	
@@ -1533,7 +1559,7 @@ def bruce():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_bruce
 	#print("(To leave, type "return")")
-	if areas.dracordlair == False:
+	if game.player.areas.dracordlair == False:
 		print("\"So, you want to fight a dragon? Who sent you?\"")
 		time.sleep(2)
 		print("\"Ruffin? I know him! You must be the chosen one! Where is he anyway?\"")
@@ -1545,11 +1571,38 @@ def bruce():
 		print("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
 		time.sleep(5)
 		print("\"Farewell and good luck %s.\"" % (game.player.name))
-		areas.dracordlair = True
+		time.sleep(4)
+		game.player.areas.dracordlair = True
 		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
 		redwind()
+	
+def en_dracord():
+	game.set_current_enemy(no_enemy)
+	
+def ext_dracord():
+	if game.player.command in ["back", "return", "redwind"]:
+		redwind()
+	else:
+		show_entry_message()
+	
+def dracord():
+	game.player.savepos = bruce
+	save()
+	en_bruce()
+	log_stats("redwind")
+	game.player.randhint = ["What do you want? Talk to Bruce..."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_bruce
+	print("(To leave, type \"return\")")
+	if game.player.visiteddracord == False:
+		game.player.visiteddracord = True
+	else:
+		print("You're not ready to fight Dracord.")
+		redwind()
+	
 	
 #end
 def end():
@@ -1571,7 +1624,54 @@ def end():
 
 """
 def options():
-	print("Commands:\n Save Manager\n Back\n>")
+	while True:
+		choice = input("Commands:\n Save Manager\n Back\n>").lower()
+		if choice == "save manager":
+			Save_Mangager
+	
+
+def Save_Manager():
+	def printsaves():
+		print("AVAILABLE SAVES")
+		print(", ".join(map(str, os.listdir("saves"))))
+		print("\n")
+
+	print("MILDWIND SAVE MANAGER (EXPERIMENTAL)")
+
+	try:
+		os.listdir("saves")
+		print("\n")
+		print("With the save manager, you can type the following commands:\nDelete\nRefresh\nClear\nOptions\nExit")
+
+		while True:
+			print("\n")
+			printsaves()
+			command = input(">").lower()
+			if command == "delete":
+				file = input("Type the name of the save file you want to delete.\n>")
+				confirm = input("Are you sure you want to delete " + file + " (y/n)?\n>").lower()
+				if confirm == "y":
+					try:
+						os.remove("saves/" + file)
+					except FileNotFoundError:
+						print("File not found.")
+				else:
+					print("Back to main menu.")
+			elif command == "exit":
+				confirm = input("Are you sure you want to exit (y/n)?\n>").lower()
+				if confirm == "y":
+					sys.exit()
+				else:
+					print("Back to main menu.")
+			elif command == "options":
+				options()
+			elif command in ["clear", "cls"]:
+				clear = "\n" *100
+				print(clear)
+			else:
+				print("Invalid command entered.")
+	except FileNotFoundError:
+		input("\nNo \"saves\" folder found. Run the game first.")
 
 """
 		
@@ -1591,7 +1691,8 @@ def game_mode_select():
 		if choice in ["", "story"]
 			story_start()
 		elif choice == "challenge":
-			challenge()
+			print("Not ready yet.")
+			#challenge()
 		elif choice == "options":
 			options()
 		else:
