@@ -491,10 +491,8 @@ def commands():
 			show_player_stats()
 		elif game.player.command == "enstats":
 			show_enemy_stats()
-		"""
-		elif game.player.command == "inventory":
-			show_inventory()
-		"""
+		#elif game.player.command == "inventory":
+			#show_inventory()
 		elif game.player.command == "help":
 			show_help()
 		elif game.player.command == "newname":
@@ -509,10 +507,8 @@ def commands():
 			quit()
 		elif game.player.command == "quote":
 			show_random_quote()
-		"""
-		elif game.player.command == "achievement":
-			show_achievement()
-		"""
+		#elif game.player.command == "achievement":
+			#show_achievement()
 		elif game.player.command == "credits":
 			show_credits()
 		elif game.player.command == "cheats":
@@ -621,7 +617,7 @@ def show_help():
 			
 def show_cheats():
 	print("WARNING! Cheats could break your save!\n")
-	print("Maxstamina\nStamfill\nMaxhealth\nHeal\nPotions\nHints\nEvents\nExit")
+	print("Maxstamina\nStamfill\nMaxhealth\nHeal\nPotions\nHints\nEvents\nAreas\nExit")
 	game.player.cheated = True
 	while True:
 		cheatcmd = input("CHEATS>").lower()
@@ -712,6 +708,34 @@ def show_cheats():
 				game.player.headbanger = not game.player.headbanger
 			elif value == "runfailed":
 				game.player.runfailed = not game.player.runfailed
+			else:
+				show_entry_message()
+		elif cheatcmd == "areas":
+			print("Dracord = ", game.player.areas.dracordlair)
+			print("Forest = ", game.player.areas.forest)
+			print("Swamp = ", game.player.areas.swamp)
+			print("Mountains = ", game.player.areas.mountains)
+			print("North Mine = ", game.player.areas.northmine)
+			print("South Mine = ", game.player.areas.southmine)
+			print("River = ", game.player.areas.river)
+			print("Library = ", game.player.areas.library)
+			value = input("Choose a value to toggle.\nCHEATS/AREAS>").lower()
+			if value == "dracord":
+				game.player.areas.dracordlair = not game.player.areas.dracordlair
+			elif value == "forest":
+				game.player.areas.forest = not game.player.areas.forest
+			elif value == "swamp":
+				game.player.areas.swamp = not game.player.areas.swamp
+			elif value == "mountains":
+				game.player.areas.mountains = not game.player.areas.mountains
+			elif value == "north mine":
+				game.player.areas.northmine = not game.player.areas.northmine
+			elif value == "south mine":
+				game.player.areas.southmine = not game.player.areas.southmine
+			elif value == "river":
+				game.player.areas.river = not game.player.areas.river
+			elif value == "library":
+				game.player.areas.library = not game.player.areas.library
 			else:
 				show_entry_message()
 		elif cheatcmd in ["exit", "quit", "kill", "close"]:
@@ -1547,7 +1571,7 @@ def ext_redwind():
 	elif game.player.command == "river":
 		show_entry_message()
 	elif game.player.command == "library":
-		show_entry_message()
+		library()
 	else:
 		show_entry_message()
 
@@ -1606,9 +1630,12 @@ def bruce():
 		time.sleep(4)
 		print("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
 		time.sleep(5)
+		print("Oh, I forgot to mention, if you need any help, check the library.")
+		time.sleep(3)
 		print("\"Farewell and good luck %s.\"" % (game.player.name))
 		time.sleep(4)
 		game.player.areas.dracordlair = True
+		game.player.areas.library = True
 		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
@@ -1624,11 +1651,11 @@ def ext_dracord():
 		show_entry_message()
 	
 def dracord():
-	game.player.savepos = bruce
+	game.player.savepos = dracord
 	save()
-	en_bruce()
+	en_dracord()
 	log_stats("redwind")
-	game.player.randhint = ["What do you want? Talk to Bruce..."]
+	game.player.randhint = ["Did you check the library?"]
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_dracord
@@ -1667,6 +1694,38 @@ def dracord():
 	else:
 		print("You're not ready to fight Dracord.")
 		redwind()
+
+def en_library():
+	game.set_current_enemy(no_enemy)
+		
+def ext_library():
+	if game.player.command in ["back", "return", "redwind"]:
+		redwind()
+	elif game.player.command == "ask for scrolls":
+		pass
+	else:
+		show_entry_message()
+		
+def library():
+	game.player.savepos = library
+	save()
+	en_library()
+	log_stats("redwind")
+	game.player.randhint = ["Hints tend to be useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_library
+	time.sleep(3)
+	print("(To leave, type \"return\")")
+	time.sleep(1)
+	print("Welcome to the Redwind Library. I'm Adam.")
+	if game.player.transbook == False:
+		time.sleep(3)
+		print("I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.")
+		game.player.transbook = True
+	else:
+		pass
+	commands()
 		
 def en_final_battle():
 	game.set_current_enemy(no_enemy)
