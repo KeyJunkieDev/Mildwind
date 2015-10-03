@@ -11,6 +11,10 @@ This game is currently in a very early state, there are only a few fully (probab
 =================================================
 
 Changelog
+0.4.1.0
+-Added more story elements
+-Bug fixes
+
 0.4.0.4
 -Added inventory
 -Enemy damage is more random
