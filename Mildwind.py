@@ -2,7 +2,7 @@ import re, random, logging, os, sys, pickle, time
 from enum import Enum
 
 #version
-version = "Alpha 0.4.0.4 (Windows Edition)"
+version = "Alpha 0.4.1.0 (Windows Edition)"
 experimental_version = False
 
 credits = '''
@@ -149,6 +149,7 @@ class Item(Enum):
 	relic				= "Dragon Stone"
 	drazmite			= "Drazmite Ore"
 	iron				= "Iron Ore"
+	herb				= "Herb"
 
 	def name(self):
 		return self.value
@@ -393,6 +394,7 @@ class Enemy():
 		self.runmsg				= "You escaped the %s." % (self.name.lower())
 		self.runfailedmsg		= ""
 		self.ending				= ""
+		self.runending			= ""
 
 	def min_attack(self):
 		return self.attack[0]
@@ -489,6 +491,10 @@ def commands():
 			show_player_stats()
 		elif game.player.command == "enstats":
 			show_enemy_stats()
+		"""
+		elif game.player.command == "inventory":
+			show_inventory()
+		"""
 		elif game.player.command == "help":
 			show_help()
 		elif game.player.command == "newname":
@@ -503,6 +509,10 @@ def commands():
 			quit()
 		elif game.player.command == "quote":
 			show_random_quote()
+		"""
+		elif game.player.command == "achievement":
+			show_achievement()
+		"""
 		elif game.player.command == "credits":
 			show_credits()
 		elif game.player.command == "cheats":
@@ -1530,9 +1540,13 @@ def ext_redwind():
 		show_entry_message()
 	elif game.player.command == "mountains":
 		show_entry_message()
-	elif game.player.command == "mine":
+	elif game.player.command == "north mine":
+		show_entry_message()
+	elif game.player.command == "south mine":
 		show_entry_message()
 	elif game.player.command == "river":
+		show_entry_message()
+	elif game.player.command == "library":
 		show_entry_message()
 	else:
 		show_entry_message()
@@ -1555,8 +1569,10 @@ def redwind():
 	available_areas(game.player.areas.forest, "-Forest")
 	available_areas(game.player.areas.swamp, "-Swamp")
 	available_areas(game.player.areas.mountains, "-Mountains")
-	available_areas(game.player.areas.mine, "-Mine")
+	available_areas(game.player.areas.northmine, "-North Mine")
+	available_areas(game.player.areas.southmine, "-south Mine")
 	available_areas(game.player.areas.river, "-River")
+	available_areas(game.player.areas.library, "-Library")
 	commands()
 	#list of places to go to. I plan to have areas that unlock as you progress.
 	
@@ -1615,21 +1631,29 @@ def dracord():
 	game.player.randhint = ["What do you want? Talk to Bruce..."]
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
-	game.player.cmdext = ext_bruce
+	game.player.cmdext = ext_dracord
+	time.sleep(2)
+	print("You begin walking to Dracord's lair.")
+	time.sleep(4)
 	print("(To leave, type \"return\")")
 	if game.player.dracordUnlock == False:
 		print("There is a large door with hieroglyphs on it.")
+		time.sleep(4)
 		if game.player.hasstone:
 			print("You place the Dragon Stone on the pedestal. The door starts to slowly open. As you watch the beastly Dracord sleep, you feel a negative energy.")
 			game.player.dracordUnlocked = True
+			time.sleep(5)
 			dracord()
 		elif game.player.transbook:
 			print("According to the translations in the book, the hieroglyphs on the door say\n\"If entry is what you seek, you must place the Dragon Stone on the Pedestal of Darkness. The Dragon Stone is stowed away and guarded at the highest point in Redwind.\"\n\nYou can now go to the Mountains.")
+			time.sleep(20)
 			game.player.areas.mountains = True
 			print("You decide to return back to the village.")
+			time.sleep(4)
 			redwind()
 		else:
 			print("You don't understand any of the hieroglyph on the door. You return to the village.")
+			time.sleep(4)
 			redwind()
 	elif game.player.dracordUnlocked:
 		while True:
@@ -1643,7 +1667,15 @@ def dracord():
 	else:
 		print("You're not ready to fight Dracord.")
 		redwind()
+		
+def en_final_battle():
+	game.set_current_enemy(no_enemy)
 	
+def ext_final_battle():
+	show_entry_message()
+	
+def final_battle():
+	redwind()
 	
 #end
 def end():
