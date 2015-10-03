@@ -146,6 +146,9 @@ class Item(Enum):
 	scroll				= "Scroll (Hint)"
 	torch				= "Torch"
 	prison_key			= "Prison Key"
+	relic				= "Dragon Stone"
+	drazmite			= "Drazmite Ore"
+	iron				= "Iron Ore"
 
 	def name(self):
 		return self.value
@@ -165,19 +168,33 @@ class Inventory():
 class Unlocked_areas():
 	def __init__(self):
 		self.dracordlair		= False
-		#Visit the first time to discover where the mine is.
+		#Visit the first time to discover where the key is. No understanding of words without book.
 		#Fail to fight Dracord. Revived by Ruffin's ghost at Redwind. Visit Bruce.
 		#Fight with new sword, win.
 		self.forest				= False
-		#Gain access by talking to Bruce. Collect wood for a sword.
+		#Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
+		#Make player wait 30 minutes. Get random amount of herbs.
 		self.swamp				= False
-		#Bruce gives you map to swamp. Fight Giant Turtle, trolls, and Witch. Get key to fight Dracord.
+		#Bruce gives you map to swamp. Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
 		self.mountains			= False
-		#Reveals that all the chores are to enchant powerful sword. Fight werewolves. Get to cave. Place sword and shield in enchanting pedestal.
-		self.mine				= False
+		#Fight bear. Grab key.
+		self.northmine			= False
 		#Visit to gather materials to make a powerful sword.
+		self.southmine			= False
+		#Come here for special ore. Fight scorpion.
+		#Bruce can turn scorpion shell into armor.
+		#Scorpion blood can be drank as special potion.
 		self.river				= False
-		#Bruce asks to find gold. Find powerful shield.
+		#Bruce refers you to Dazzle. Enchant sword. Get directed to swamp and other mine. Gives special potion.
+		#Player can come here to brew potions.
+		
+		#Display:
+		#Herbs: X
+		#Potionsize1 = 3 herbs
+		#Potionsize2 = etc...
+		self.library			= False
+		#Go here for translation book.
+		#Also get scroll if 0.
 
 class Player():
 	def __init__(self, name):
@@ -201,6 +218,7 @@ class Player():
 		self.extattack		= 0
 		self.stamina		= 0
 
+		self.hasstone		= False
 		self.hasitems		= False
 		self.stolen			= False
 		self.ruffindead		= False
@@ -209,6 +227,8 @@ class Player():
 		self.haswolf		= False
 		self.visiteddracord = False
 
+		self.transbook		= False
+		self.dracordUnlock	= False
 		self.shielduse		= 0
 		self.cheated		= False
 		self.savepos		= []
@@ -1597,8 +1617,29 @@ def dracord():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_bruce
 	print("(To leave, type \"return\")")
-	if game.player.visiteddracord == False:
-		game.player.visiteddracord = True
+	if game.player.dracordUnlock == False:
+		print("There is a large door with hieroglyphs on it.")
+		if game.player.hasstone:
+			print("You place the Dragon Stone on the pedestal. The door starts to slowly open. As you watch the beastly Dracord sleep, you feel a negative energy.")
+			game.player.dracordUnlocked = True
+			dracord()
+		elif game.player.transbook:
+			print("According to the translations in the book, the hieroglyphs on the door say\n\"If entry is what you seek, you must place the Dragon Stone on the Pedestal of Darkness. The Dragon Stone is stowed away and guarded at the highest point in Redwind.\"\n\nYou can now go to the Mountains.")
+			game.player.areas.mountains = True
+			print("You decide to return back to the village.")
+			redwind()
+		else:
+			print("You don't understand any of the hieroglyph on the door. You return to the village.")
+			redwind()
+	elif game.player.dracordUnlocked:
+		while True:
+			choice = input("Are you ready to fight Dracord (y/n)?\n>").lower()
+			if choice == "y":
+				final_battle()
+			elif choice == "n":
+				redwind()
+			else:
+				print("Not \"y\" or \"n\"")
 	else:
 		print("You're not ready to fight Dracord.")
 		redwind()
@@ -1621,6 +1662,9 @@ def end():
 		sys.exit()
 
 #============================================challenge mode============================================
+
+
+#==========================================end challenge mode==========================================
 
 """
 def options():
