@@ -146,6 +146,7 @@ class Item(Enum):
 	scroll				= "Scroll (Hint)"
 	torch				= "Torch"
 	prison_key			= "Prison Key"
+	trans_book			= "Book of the Dragon Language"
 	relic				= "Dragon Stone"
 	drazmite			= "Drazmite Ore"
 	iron				= "Iron Ore"
@@ -700,6 +701,8 @@ def show_cheats():
 			value = input("Choose a value to toggle.\nCHEATS/EVENTS>")
 			if value == "hasitems":
 				game.player.hasitems = not game.player.hasitems
+			if value == "transbook":
+				game.player.transbook = not game.player.transbook
 			elif value == "stolen":
 				game.player.stolen = not game.player.stolen
 			elif value == "ruffindead":
@@ -1695,6 +1698,43 @@ def dracord():
 		print("You're not ready to fight Dracord.")
 		redwind()
 
+"""
+def en_mountains():
+	game.set_current_enemy(no_enemy)
+		
+def ext_mountains():
+	if game.player.command in ["back", "return", "redwind"]:
+		redwind()
+	elif game.player.command in ["skeleton", "examine skeleton", "examine", "check", "check skeleton", "loot", "loot skeleton", "look at skeleton", "scavenge", "scavenge skeleton"]:
+	print("You picked up some potions. One of which increased your health and made you stronger.")
+	game.player.maxhealth += 20
+	game.player.fullheal()
+	game.player.maxstamina += 2
+	game.player.extattack += 20
+	elif game.player.command == "climb":
+		mountains_1()
+	else:
+		show_entry_message()
+		
+def mountains():
+	game.player.savepos = mountains
+	save()
+	en_mountains()
+	log_stats("redwind")
+	game.player.randhint = ["Hints tend to be useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_library
+	print("You begin to walk to Mount Amberdrift.")
+	time.sleep(3)
+	print("(To leave, type \"return\")")
+	time.sleep(1)
+	print("You look up a the tall mountain. Everything begins to feel big around you. You start climbing.")
+	time.sleep(20)
+	print("After some time, you made it to a spot to rest. You find the skelton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type "climb").")
+	commands()
+"""
+		
 def en_library():
 	game.set_current_enemy(no_enemy)
 		
@@ -1702,7 +1742,11 @@ def ext_library():
 	if game.player.command in ["back", "return", "redwind"]:
 		redwind()
 	elif game.player.command == "ask for scrolls":
-		pass
+		if (not game.player.has_item(Item.scroll)):
+			print("Here are some scrolls I have lying around.")
+			game.player.give_item(Item.scroll, 3)
+		else:
+			print("You seem to have scrolls. Sorry, but I'm saving these for people who need them.")
 	else:
 		show_entry_message()
 		
@@ -1718,11 +1762,12 @@ def library():
 	time.sleep(3)
 	print("(To leave, type \"return\")")
 	time.sleep(1)
-	print("Welcome to the Redwind Library. I'm Adam.")
+	print("Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty.")
 	if game.player.transbook == False:
 		time.sleep(3)
 		print("I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.")
 		game.player.transbook = True
+		game.player.give_item(Item.trans_book)
 	else:
 		pass
 	commands()
