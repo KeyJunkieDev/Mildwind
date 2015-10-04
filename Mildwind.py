@@ -1421,8 +1421,8 @@ def ext_part11():
 		else:
 			print("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord feels him climbing up him like a flea and smacks his tail into the ground to shake Ruffin off. Ruffin hits the ground hard.")
 			print("")
-			print("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to my secret order; the Triblades... They will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
-			print("Ruffin handed you his letter regarding the Triblades, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
+			print("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
+			print("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
 			print("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you can attack, he flies up and breaks through the ceiling. Rubble begins to fall and causes the ground to collapse. You fall through and everything goes black...")
 			game.player.ruffindead = True
 			input("Wake up (Press enter).")
@@ -1434,8 +1434,8 @@ def ext_part11():
 		else:
 			print("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climp up his tail. Dracord felt him climbing up him like a flea and smacked his tail into the ground to shake Ruffin off. Ruffin hit the ground hard.")
 			print("")
-			print("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to my secret order; the Triblades... They will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
-			print("Ruffin handed you his letter regarding the Triblades, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
+			print("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
+			print("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
 			print("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you could attack, he flew up and broke through the ceiling. Rubble began to fall and caused the ground to collapse. You fall through and everything goes black...")
 			game.player.ruffindead = True
 			input("Wake up (Press enter).")
@@ -1762,7 +1762,7 @@ def library():
 	time.sleep(3)
 	print("(To leave, type \"return\")")
 	time.sleep(1)
-	print("Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty.")
+	print("Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty, just ask.")
 	if game.player.transbook == False:
 		time.sleep(3)
 		print("I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.")
