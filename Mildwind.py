@@ -1192,7 +1192,7 @@ def part5():
 	game.player.savepos = part5
 	save()
 	log_stats("4")
-	game.player.randhint = ["I can't help you."]
+	game.player.randhint = ["Ruffin CAN'T die."]
 	game.player.cmdext = ext_part5
 	print("\n\"%s, watch out!\" Ruffin tried to warn you about the pressure plate, but it was too late. Arrows are headed in your direction. What do you do?" % (game.player.name))
 	commands()
@@ -1566,7 +1566,7 @@ def ext_redwind():
 	elif game.player.command == "swamp":
 		show_entry_message()
 	elif game.player.command == "mountains":
-		show_entry_message()
+		mountains()
 	elif game.player.command == "north mine":
 		show_entry_message()
 	elif game.player.command == "south mine":
@@ -1633,7 +1633,7 @@ def bruce():
 		time.sleep(4)
 		print("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
 		time.sleep(5)
-		print("Oh, I forgot to mention, if you need any help, check the library.")
+		print("\"Oh, I forgot to mention, if you need any help, check the library.\"")
 		time.sleep(3)
 		print("\"Farewell and good luck %s.\"" % (game.player.name))
 		time.sleep(4)
@@ -1666,26 +1666,7 @@ def dracord():
 	print("You begin walking to Dracord's lair.")
 	time.sleep(4)
 	print("(To leave, type \"return\")")
-	if game.player.dracordUnlock == False:
-		print("There is a large door with hieroglyphs on it.")
-		time.sleep(4)
-		if game.player.hasstone:
-			print("You place the Dragon Stone on the pedestal. The door starts to slowly open. As you watch the beastly Dracord sleep, you feel a negative energy.")
-			game.player.dracordUnlocked = True
-			time.sleep(5)
-			dracord()
-		elif game.player.transbook:
-			print("According to the translations in the book, the hieroglyphs on the door say\n\"If entry is what you seek, you must place the Dragon Stone on the Pedestal of Darkness. The Dragon Stone is stowed away and guarded at the highest point in Redwind.\"\n\nYou can now go to the Mountains.")
-			time.sleep(20)
-			game.player.areas.mountains = True
-			print("You decide to return back to the village.")
-			time.sleep(4)
-			redwind()
-		else:
-			print("You don't understand any of the hieroglyph on the door. You return to the village.")
-			time.sleep(4)
-			redwind()
-	elif game.player.dracordUnlocked:
+	if game.player.dracordUnlock:
 		while True:
 			choice = input("Are you ready to fight Dracord (y/n)?\n>").lower()
 			if choice == "y":
@@ -1694,11 +1675,33 @@ def dracord():
 				redwind()
 			else:
 				print("Not \"y\" or \"n\"")
+	elif game.player.dracordUnlock == False:
+		print("There is a large door with hieroglyphs on it.")
+		time.sleep(4)
+		if game.player.hasstone:
+			print("You place the Dragon Stone on the pedestal. The door starts to slowly open. As you watch the beastly Dracord sleep, you feel a negative energy.")
+			game.player.dracordUnlock = True
+			time.sleep(5)
+			dracord()
+		elif game.player.transbook:
+			print("According to the translations in the book, the hieroglyphs on the door say\n\"If entry is what you seek, you must place the Dragon Stone on the Pedestal of Darkness. The Dragon Stone is stowed away and guarded at the highest point in Redwind.\"")
+			if game.player.areas.mountains:
+				pass
+			else:
+				print("\nYou can now go to the Mountains.")
+				game.player.areas.mountains = True
+			time.sleep(20)
+			print("You decide to return back to the village.")
+			time.sleep(4)
+			redwind()
+		else:
+			print("You don't understand any of the hieroglyph on the door. You return to the village.")
+			time.sleep(4)
+			redwind()
 	else:
 		print("You're not ready to fight Dracord.")
 		redwind()
 
-"""
 def en_mountains():
 	game.set_current_enemy(no_enemy)
 		
@@ -1706,12 +1709,17 @@ def ext_mountains():
 	if game.player.command in ["back", "return", "redwind"]:
 		redwind()
 	elif game.player.command in ["skeleton", "examine skeleton", "examine", "check", "check skeleton", "loot", "loot skeleton", "look at skeleton", "scavenge", "scavenge skeleton"]:
-	print("You picked up some potions. One of which increased your health and made you stronger.")
-	game.player.maxhealth += 20
-	game.player.fullheal()
-	game.player.maxstamina += 2
-	game.player.extattack += 20
+		if game.player.hasitems:
+			print("You hope to not be in the same position as this person.")
+		else:	
+			print("You picked up some potions. One of which increased your health and made you stronger.")
+			game.player.maxhealth += 20
+			game.player.fullheal()
+			game.player.maxstamina += 2
+			game.player.extattack += 20
+			game.player.hasitems = True
 	elif game.player.command == "climb":
+		print("You continue up Mount Amberdrift.")
 		mountains_1()
 	else:
 		show_entry_message()
@@ -1724,17 +1732,88 @@ def mountains():
 	game.player.randhint = ["Hints tend to be useless."]
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
-	game.player.cmdext = ext_library
-	print("You begin to walk to Mount Amberdrift.")
+	game.player.cmdext = ext_mountains
+	if game.player.hasstone:
+		print("There is no need to go back to the mountains.")
+		redwind()
+	else:	
+		print("You begin to walk to Mount Amberdrift.")
+		time.sleep(3)
+		print("(To leave, type \"return\")")
+		time.sleep(1)
+		print("You look up a the tall mountain. Everything begins to feel big around you. You start climbing.")
+		time.sleep(20)
+		print("After some time, you made it to a spot to rest. You find the skelton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type \"climb\").")
+		commands()
+
+def en_mountains_1():
+	bear = Enemy("Guardian Bear", 200, (45, 75), 3)
+	bear.rewards = [(Potion.large, 2)]
+
+	bear.deadmsg = "You take the fur to use as a coat."
+	bear.killedmsg = "You attacked the bear. It was unbearable. You have a health of {0}. You also picked up a large potion or two (\"continue\")."
+	bear.damagemsg = "You attacked the bear, but he clawed you back. He has a health of {0}, and you have a health of {1}."
+	bear.deathmsg = "You were mauled to death."
+
+	bear.shieldkilledmsg = "You safely deflected the bear's attacks and killed him. Your health is now {0} and you obtained two large potions (\"continue\")."
+	bear.shieldmsg = "You deflected the bear's attack and he hurt herself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
+
+	bear.rundamagemsg = "The bear clawed you. Your health is now {1}. You can't leave until he's dead."
+
+	game.set_current_enemy(bear)
+	
+def ext_mountains_1():
+	if game.player.command == "shield":
+		game.player.use_shield(game.current_enemy)
+	elif game.player.command in ["attack", "fight", "a"]:
+		game.player.attack_enemy(game.current_enemy)
+	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		if game.player.run_from_enemy(game.current_enemy, [0, 25, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 75, 75, 75, 75, 75, 75, 75, 75, 100]):
+			mountains_2()
+	else:
+		show_entry_message()
+	
+def mountains_1():
+	game.player.savepos = mountains_1
+	save()
+	en_mountains_1()
+	log_stats("mountains")
+	game.player.randhint = ["Hints tend to be useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_mountains_1
+	time.sleep(5)
+	print("You make it to the top of the mountain. The cave is just ahead. You begin to approach it.")
 	time.sleep(3)
-	print("(To leave, type \"return\")")
-	time.sleep(1)
-	print("You look up a the tall mountain. Everything begins to feel big around you. You start climbing.")
-	time.sleep(20)
-	print("After some time, you made it to a spot to rest. You find the skelton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type "climb").")
+	print("You got to the entrance of the cave. Suddenly an armored bear; the Guardian Bear, jumps in front of you.")
 	commands()
-"""
+
+def en_mountains_2():
+	game.set_current_enemy(no_enemy)
 		
+def ext_mountains_2():
+	show_entry_message()
+		
+def mountains_2():
+	game.player.savepos = mountains_2
+	save()
+	en_mountains_2()
+	log_stats("mountains_1")
+	game.player.randhint = ["Hints tend to be useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.hasitems = False
+	game.player.cmdext = ext_mountains_2
+	time.sleep(2)
+	print("You look up to see the Dragon Stone. You gaze upon it and embrace its beauty.")
+	time.sleep(7)
+	print("After a few moments, you regain your focus and grab the Dragon Stone. You begin to walk back to Redwind.")
+	game.player.give_item(Item.relic)
+	game.player.hasstone = True
+	time.sleep(6)
+	redwind()
+	
+
 def en_library():
 	game.set_current_enemy(no_enemy)
 		
