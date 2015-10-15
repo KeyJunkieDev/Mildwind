@@ -151,6 +151,7 @@ class Item(Enum):
 	drazmite			= "Drazmite Ore"
 	iron				= "Iron Ore"
 	herb				= "Herb"
+	swamp_map			= "Map to Swamp"
 
 	def name(self):
 		return self.value
@@ -177,7 +178,7 @@ class Unlocked_areas():
 		#Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
 		#Make player wait 30 minutes. Get random amount of herbs.
 		self.swamp				= False
-		#Bruce gives you map to swamp. Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
+		#Library gives you map to swamp. Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
 		self.mountains			= False
 		#Fight bear. Grab key.
 		self.northmine			= False
@@ -220,6 +221,7 @@ class Player():
 		self.extattack		= 0
 		self.stamina		= 0
 
+		self.hasmap			= False
 		self.hasstone		= False
 		self.hasitems		= False
 		self.stolen			= False
@@ -231,6 +233,8 @@ class Player():
 
 		self.transbook		= False
 		self.dracordUnlock	= False
+		self.dracordReady	= False
+		self.dracordTry		= False
 		self.shielduse		= 0
 		self.cheated		= False
 		self.savepos		= []
@@ -1250,6 +1254,7 @@ def ext_part7():
 		if game.player.has_item(Item.torch):
 			print("You placed the torch onto the holder. It opened a secret path. You walk through it.")
 			print("You skipped two fights.")
+			game.player.healthbank = game.player.maxhealth
 			part10()
 		else:
 			print("You do not have a torch.")
@@ -1822,10 +1827,10 @@ def ext_library():
 		redwind()
 	elif game.player.command == "ask for scrolls":
 		if (not game.player.has_item(Item.scroll)):
-			print("Here are some scrolls I have lying around.")
+			print("\"Here are some scrolls I have lying around.\"")
 			game.player.give_item(Item.scroll, 3)
 		else:
-			print("You seem to have scrolls. Sorry, but I'm saving these for people who need them.")
+			print("\"You seem to have scrolls. Sorry, but I'm saving these for people who need them.\"")
 	else:
 		show_entry_message()
 		
@@ -1841,12 +1846,17 @@ def library():
 	time.sleep(3)
 	print("(To leave, type \"return\")")
 	time.sleep(1)
-	print("Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty, just ask.")
+	print("\"Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty, just ask.\"")
 	if game.player.transbook == False:
 		time.sleep(3)
-		print("I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.")
+		print("\"I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.\"")
 		game.player.transbook = True
 		game.player.give_item(Item.trans_book)
+	elif game.player.dracordTry and game.player.hasmap not True:
+		print("\"I saw you going to the mountain earlier. You seem like an adventurer. Here. Have this map I found.\"")
+		game.player.hasmap = True
+		game.player.give_item(Item.swamp_map)
+		game.player.areas.swamp = True
 	else:
 		pass
 	commands()
@@ -1858,10 +1868,43 @@ def ext_final_battle():
 	show_entry_message()
 	
 def final_battle():
-	redwind()
+	game.player.savepos = final_battle
+	save()
+	en_final_battle()
+	log_stats("dracord")
+	game.player.randhint = ["Hints tend to be useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_final_battle
+	if game.player.dracordReady:
+		time.sleep(3)
+		print("You bravely walk into Dracord's lair. You drag your sword across the floor to announce your precense. Dracord growls. It is time to battle.")
+	else:
+		if game.player.dracordTry:
+			print("You already attempted to fight him before... You need to prepare. You return to Redwind.")
+			redwind()
+		else:
+			time.sleep(3)
+			print("You approach Dracord. He notices you walk in and angrily breathes smoke.")
+			time.sleep(4)
+			print("You charge at him with your sword.")
+			time.sleep(3)
+			print("*DING*")
+			time.sleep(1)
+			print("Your sword is useless. Dracord smirks and whips you out the door with his tail. You pass out.")
+			time.sleep(20)
+			print("%s!" % (game.player.name))
+			time.sleep(3)
+			print("%s! Wake up!" % (game.player.name))
+			time.sleep(5)
+			print("You slowly open your eyes. You see a glowing orb.")
+			print("%s, it's me, Ruffin...at least the spirit of me anyway. You're not ready to fight Dracord. You need a better weapon. Talk to Bruce. He can help you." % (game.player.name))
+			game.player.dracordTry = True
+			redwind()
 	
 #end
 def end():
+	#print("")
 	print("To be continued...")
 	time.sleep(2)
 	log_stats("End")
