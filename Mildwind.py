@@ -1852,7 +1852,7 @@ def library():
 		print("\"I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.\"")
 		game.player.transbook = True
 		game.player.give_item(Item.trans_book)
-	elif game.player.dracordTry and game.player.hasmap not True:
+	elif game.player.dracordTry and game.player.hasmap == False:
 		print("\"I saw you going to the mountain earlier. You seem like an adventurer. Here. Have this map I found.\"")
 		game.player.hasmap = True
 		game.player.give_item(Item.swamp_map)
