@@ -1748,11 +1748,11 @@ def mountains():
 		time.sleep(1)
 		print("You look up a the tall mountain. Everything begins to feel big around you. You start climbing.")
 		time.sleep(20)
-		print("After some time, you made it to a spot to rest. You find the skelton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type \"climb\").")
+		print("After some time, you made it to a spot to rest. You find the skeleton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type \"climb\").")
 		commands()
 
 def en_mountains_1():
-	bear = Enemy("Guardian Bear", 200, (45, 75), 3)
+	bear = Enemy("Guardian Bear", 100, (45, 65), 2)
 	bear.rewards = [(Potion.large, 2)]
 
 	bear.deadmsg = "You take the fur to use as a coat."
