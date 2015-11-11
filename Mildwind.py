@@ -199,6 +199,16 @@ class Unlocked_areas():
 		#Go here for translation book.
 		#Also get scroll if 0.
 
+'''
+class Achievements():
+	def __init__(self):
+		#ID = ["achievement", "description"]
+		headbanger = ["Headbanger", "Bash your head into the wall"]
+		encounter = ["The Encounter", "Meet Ruffin"]
+		suicide = ["Suicide", "Kill yourself (the doppleghanger)"]
+		
+'''
+		
 class Player():
 	def __init__(self, name):
 		self.name			= name
