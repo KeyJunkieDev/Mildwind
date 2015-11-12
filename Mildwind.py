@@ -171,16 +171,16 @@ class Inventory():
 class Unlocked_areas():
 	def __init__(self):
 		self.dracordlair		= False
-		#Visit the first time to discover where the key is. No understanding of words without book.
-		#Fail to fight Dracord. Revived by Ruffin's ghost at Redwind. Visit Bruce.
+		#[DONE] Visit the first time to discover where the key is. No understanding of words without book.
+		#[DONE] Fail to fight Dracord. Revived by Ruffin's ghost at Redwind. Visit Bruce.
 		#Fight with new sword, win.
 		self.forest				= False
-		#Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
+		#[DONE] Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
 		#Make player wait 30 minutes. Get random amount of herbs.
 		self.swamp				= False
 		#Library gives you map to swamp. Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
 		self.mountains			= False
-		#Fight bear. Grab key.
+		#[DONE] Fight bear. Grab key.
 		self.northmine			= False
 		#Visit to gather materials to make a powerful sword.
 		self.southmine			= False
@@ -196,8 +196,8 @@ class Unlocked_areas():
 		#Potionsize1 = 3 herbs
 		#Potionsize2 = etc...
 		self.library			= False
-		#Go here for translation book.
-		#Also get scroll if 0.
+		#[DONE] Go here for translation book.
+		#[DONE] Also get scroll if 0.
 
 '''
 class Achievements():
@@ -1577,7 +1577,7 @@ def ext_redwind():
 	elif game.player.command == "dracord":
 		area_check(game.player.areas.dracordlair, dracord)
 	elif game.player.command == "forest":
-		show_entry_message()
+		area_check(game.player.areas.forest, forest)
 	elif game.player.command == "swamp":
 		show_entry_message()
 	elif game.player.command == "mountains":
@@ -1594,6 +1594,7 @@ def ext_redwind():
 		show_entry_message()
 
 def redwind():
+	game.player.areas.forest = True
 	def available_areas(area, areaname):
 		if area:
 			print(areaname)
@@ -1655,6 +1656,14 @@ def bruce():
 		game.player.areas.dracordlair = True
 		game.player.areas.library = True
 		redwind()
+	elif game.player.areas.forest == false and game.player.dracordTry:
+		print("Hm... You tried to beat Dracord and failed? How are you alive?")
+		time.sleep(3)
+		print("Ruffin's ghost? Wow.")
+		time.sleep(3)
+		print("Listen, I know an enchatress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.")
+		game.player.areas.forest = True
+		game.player.areas.river = True
 	else:
 		print("Bruce doesn't have anything to tell you.")
 		redwind()
@@ -1870,6 +1879,27 @@ def library():
 	else:
 		pass
 	commands()
+	
+def forest():
+	print("You walk to the forest.")
+	time.sleep(2)
+	confirm = input("Would you like to search the forest for herbs (y/n)?\n>")
+	if confirm == "y":
+		print("Hunting for herbs...")
+		toolbar_width = 60
+		sys.stdout.write("[%s]" % (" " * toolbar_width))
+		sys.stdout.flush()
+		sys.stdout.write("\b" * (toolbar_width+1)) # return to start of line, after '['
+
+		for i in range(toolbar_width):
+			time.sleep(30)
+			sys.stdout.write("*")
+			sys.stdout.flush()
+		print("] DONE!")
+		print("You found X herbs.")
+		redwind()
+	else:
+		redwind()
 		
 def en_final_battle():
 	game.set_current_enemy(no_enemy)
