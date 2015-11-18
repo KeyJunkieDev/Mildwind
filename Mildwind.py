@@ -193,8 +193,10 @@ class Unlocked_areas():
 		
 		#Display:
 		#Herbs: X
-		#Potionsize1 = 3 herbs
-		#Potionsize2 = etc...
+		#Small		= 3 herbs
+		#Medium		= 5 herbs
+		#Large		= 7 herbs
+		#Super		= 9 herbs
 		self.library			= False
 		#[DONE] Go here for translation book.
 		#[DONE] Also get scroll if 0.
@@ -1594,7 +1596,6 @@ def ext_redwind():
 		show_entry_message()
 
 def redwind():
-	game.player.areas.forest = True
 	def available_areas(area, areaname):
 		if area:
 			print(areaname)
@@ -1892,11 +1893,14 @@ def forest():
 		sys.stdout.write("\b" * (toolbar_width+1)) # return to start of line, after '['
 
 		for i in range(toolbar_width):
-			time.sleep(30)
+			time.sleep(.030)
 			sys.stdout.write("*")
 			sys.stdout.flush()
 		print("] DONE!")
-		print("You found X herbs.")
+		herbs = random.choice([8, 9, 10, 11, 12, 13, 14, 15, 16])
+		print("You found ", herbs, " herbs.")
+		game.player.give_item(Item.herb, herbs)
+		time.sleep(3)
 		redwind()
 	else:
 		redwind()
