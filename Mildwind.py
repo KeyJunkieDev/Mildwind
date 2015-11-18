@@ -176,7 +176,7 @@ class Unlocked_areas():
 		#Fight with new sword, win.
 		self.forest				= False
 		#[DONE] Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
-		#Make player wait 30 minutes. Get random amount of herbs.
+		#[DONE] Make player wait 30 minutes. Get random amount of herbs.
 		self.swamp				= False
 		#Library gives you map to swamp. Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
 		self.mountains			= False
