@@ -152,6 +152,7 @@ class Item(Enum):
 	iron				= "Iron Ore"
 	herb				= "Herb"
 	swamp_map			= "Map to Swamp"
+	stange_recipe		= "Strange potion recipe book"
 
 	def name(self):
 		return self.value
@@ -183,12 +184,13 @@ class Unlocked_areas():
 		#[DONE] Fight bear. Grab key.
 		self.northmine			= False
 		#Visit to gather materials to make a powerful sword.
+		#Go to Bruce. 
 		self.southmine			= False
 		#Come here for special ore. Fight scorpion.
 		#Bruce can turn scorpion shell into armor.
 		#Scorpion blood can be drank as special potion.
 		self.river				= False
-		#Bruce refers you to Dazzle. Enchant sword. Get directed to swamp and other mine. Gives special potion.
+		#Bruce refers you to Dazzle. Enchant sword. Get directed other mine. Gives special potion.
 		#Player can come here to brew potions.
 		
 		#Display:
@@ -197,6 +199,7 @@ class Unlocked_areas():
 		#Medium		= 5 herbs
 		#Large		= 7 herbs
 		#Super		= 9 herbs
+		#Strange	= ? herbs (50. Get recipe at library.)
 		self.library			= False
 		#[DONE] Go here for translation book.
 		#[DONE] Also get scroll if 0.
@@ -233,6 +236,8 @@ class Player():
 		self.extattack		= 0
 		self.stamina		= 0
 
+		self.strangeperm	= False
+		self.strangerecipe	= False
 		self.hasmap			= False
 		self.hasstone		= False
 		self.hasitems		= False
@@ -1657,14 +1662,15 @@ def bruce():
 		game.player.areas.dracordlair = True
 		game.player.areas.library = True
 		redwind()
-	elif game.player.areas.forest == false and game.player.dracordTry:
+	elif game.player.areas.forest == False and game.player.dracordTry:
 		print("Hm... You tried to beat Dracord and failed? How are you alive?")
 		time.sleep(3)
 		print("Ruffin's ghost? Wow.")
 		time.sleep(3)
-		print("Listen, I know an enchatress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.")
+		print("Listen, I know an enchantress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.")
 		game.player.areas.forest = True
 		game.player.areas.river = True
+		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
 		redwind()
@@ -1772,7 +1778,7 @@ def mountains():
 		commands()
 
 def en_mountains_1():
-	bear = Enemy("Guardian Bear", 100, (45, 65), 2)
+	bear = Enemy("Guardian Bear", 150, (45, 65), 3)
 	bear.rewards = [(Potion.large, 2)]
 
 	bear.deadmsg = "You take the fur to use as a coat."
