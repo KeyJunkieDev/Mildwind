@@ -1969,19 +1969,8 @@ def end():
 		input("Thank you for playing my game!")
 		sys.exit()
 
-#============================================challenge mode============================================
-
-
-#==========================================end challenge mode==========================================
-
-"""
-def options():
-	while True:
-		choice = input("Commands:\n Save Manager\n Back\n>").lower()
-		if choice == "save manager":
-			Save_Mangager
-	
-
+#************************************************************start************************************************************
+		
 def Save_Manager():
 	def printsaves():
 		print("AVAILABLE SAVES")
@@ -1993,7 +1982,7 @@ def Save_Manager():
 	try:
 		os.listdir("saves")
 		print("\n")
-		print("With the save manager, you can type the following commands:\nDelete\nRefresh\nClear\nOptions\nExit")
+		print("With the save manager, you can type the following commands:\nDelete\nRefresh\nClear\nBack\nExit")
 
 		while True:
 			print("\n")
@@ -2015,8 +2004,8 @@ def Save_Manager():
 					sys.exit()
 				else:
 					print("Back to main menu.")
-			elif command == "options":
-				options()
+			elif command == "back":
+				select()
 			elif command in ["clear", "cls"]:
 				clear = "\n" *100
 				print(clear)
@@ -2024,8 +2013,6 @@ def Save_Manager():
 				print("Invalid command entered.")
 	except FileNotFoundError:
 		input("\nNo \"saves\" folder found. Run the game first.")
-
-"""
 		
 if not os.path.exists("saves"):
 	os.makedirs("saves")
@@ -2034,22 +2021,17 @@ print("~ Saves ~")
 print(", ".join(map(str, os.listdir("saves"))))
 print("\n")
 
-choose_name()
 
-'''
-def game_mode_select():
+def select():
 	while True:
-		choice = input("Chose a game mode. (Entering nothing automatically selects story mode).\n Story\n Challenge/Endless Mode\n Options\n>")
-		if choice in ["", "story"]
-			story_start()
-		elif choice == "challenge":
-			print("Not ready yet.")
-			#challenge()
-		elif choice == "options":
-			options()
+		choice = input("Type \"start\" or press enter to start, or \"save manager\" to mangage saves.\n>")
+		if choice in ["", "start"]:
+			start()
+		elif choice == "save manager":
+			Save_Manager()
 		else:
-			print("Invalid entry./nChose a game mode. (Entering nothing automatically selects story mode)\n Story\n Challenge/Endless Mode\n Options")
-'''
+			print("Invalid entry.")
+
 
 def tutorial_input():
 	choice = input("Would you like to play the tutorial first? (y/n)\n>").lower()
@@ -2059,19 +2041,24 @@ def tutorial_input():
 		part1()
 
 #possibly subject to being a function
-try:
-	load()
-	print("Save version: " + game.player.version)
-	if game.player.version != version:
-		print("WARNING: SAVE NOT SAME AS GAME VERSION! CRASHES MAY RESULT!")
-	while True:
-		choice = input("Would you like to load from a save? (y/n) (Enter automatically selects yes)\n>").lower()
-		if choice in ["y", ""]:
-			game.player.savepos()
-		elif choice == "n":
-			reset_stats()
-			tutorial_input()
-		else:
-			print("Nothing entered.")
-except FileNotFoundError:
-	tutorial_input()
+def start():
+	choose_name()
+	try:
+		load()
+		print("Save version: " + game.player.version)
+		if game.player.version != version:
+			print("WARNING: SAVE NOT SAME AS GAME VERSION! CRASHES MAY RESULT!")
+		while True:
+			choice = input("Would you like to load from a save? (y/n) (Enter automatically selects yes)\n>").lower()
+			if choice in ["y", ""]:
+				game.player.savepos()
+			elif choice == "n":
+				reset_stats()
+				tutorial_input()
+			else:
+				print("Nothing entered.")
+	except FileNotFoundError:
+		tutorial_input()
+		
+select()
+
