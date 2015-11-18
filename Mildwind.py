@@ -211,7 +211,7 @@ class Achievements():
 		headbanger = ["Headbanger", "Bash your head into the wall"]
 		encounter = ["The Encounter", "Meet Ruffin"]
 		suicide = ["Suicide", "Kill yourself (the doppleghanger)"]
-		
+		farmer = ["Farmer", "Gather herbs in the forest"]
 '''
 		
 class Player():
@@ -1910,6 +1910,58 @@ def forest():
 		redwind()
 	else:
 		redwind()
+
+'''
+def en_river():
+	game.set_current_enemy(no_enemy)
+
+def ext_river():
+	def brewing():
+		print("~-< BREWING >-~")
+		print("Herbs = ", game.player.inventory.herbs.amount)
+		print("Small		= 3")
+		print("Medium		= 5")
+		print("Small		= 7")
+		print("Small		= 9")
+		if not game.player.strngerecipe:
+			print("Strange		= ?")
+		else:
+			print("Strange	= 50")
+	if game.player.command in ["back", "return", "redwind"]:
+		redwind()
+	elif game.player.command == "brew":
+		if (not game.player.has_item(Item.herbs)):
+			print("\"You don't have any herbs. Find some in the forest.\"")
+		else:
+			
+	else:
+		show_entry_message()
+	
+def river():
+	game.player.savepos = river
+	save()
+	en_river()
+	log_stats("redwind")
+	game.player.randhint = ["Hints? Stop wasting them."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_river
+	time.sleep(3)
+	print("(To leave, type \"return\")")
+	time.sleep(1)
+	print("\"Welcome. Feel free to use my brewing stand to make potions (brew).\"")
+	if game.player.areas.southmine == False:
+		time.sleep(3)
+		print("\"What brings you here adventurer?\"")
+		time.sleep(3)
+		print("\"Ruffin sent you? You have to make a sword?\"")
+		time.sleep(4)
+		print("\"You should probably check the south mine for some Drazmite. It will give your sword great power when forged with it.\"")
+		game.player.areas.southmine = True
+	else:
+		pass
+	commands()
+'''
 		
 def en_final_battle():
 	game.set_current_enemy(no_enemy)
