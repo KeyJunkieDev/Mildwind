@@ -1893,7 +1893,7 @@ def forest():
 		sys.stdout.write("\b" * (toolbar_width+1)) # return to start of line, after '['
 
 		for i in range(toolbar_width):
-			time.sleep(.030)
+			time.sleep(30)
 			sys.stdout.write("*")
 			sys.stdout.flush()
 		print("] DONE!")
