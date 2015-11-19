@@ -1942,13 +1942,34 @@ def ext_river():
 			print("Medium		= 5")
 			print("Large		= 7")
 			print("Super		= 9")
-			'''
 			if not game.player.strangerecipe:
 				print("Strange		= ?")
 			else:
 				print("Strange	= 50")
-			'''
-			brewcmd = input()
+			print("To exit, type \"return\"")
+			brewcmd = input("BREWING>").lower()
+			if brewcmd == "return":
+				break
+			elif brewcmd == "small":
+				game.player.take_item(Item.herb, 3)
+				game.player.give_item(Potion.small, 1)
+				print("Small potion brewed.")
+			elif brewcmd == "medium":
+				game.player.take_item(Item.herb, 5)
+				game.player.give_item(Potion.medium, 1)
+				print("Medium potion brewed.")
+			elif brewcmd == "large":
+				game.player.take_item(Item.herb, 7)
+				game.player.give_item(Potion.large, 1)
+				print("Large potion brewed.")
+			elif brewcmd == "super":
+				game.player.take_item(Item.herb, 9)
+				game.player.give_item(Potion.super, 1)
+				print("Super potion brewed.")
+			elif brewcmd == "strange":
+				print("Not done.")
+			else:
+				print("Not a potion.")
 	if game.player.command in ["back", "return", "redwind"]:
 		redwind()
 	elif game.player.command == "brew":
