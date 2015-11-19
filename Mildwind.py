@@ -2,8 +2,8 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-version = "Alpha 0.4.1.0 (Windows Edition)"
-experimental_version = False
+version = "Alpha 0.4.2.0-EXPERIMENTAL"
+experimental_version = True
 
 credits = '''
            :dNdhs+\-._              	=============< Mildwind >=============
