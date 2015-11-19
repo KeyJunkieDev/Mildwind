@@ -1,4 +1,4 @@
-import re, random, logging, os, sys, pickle, time
+import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
@@ -533,6 +533,8 @@ def commands():
 			show_credits()
 		elif game.player.command == "cheats":
 			show_cheats()
+		elif game.player.command == "cmd":
+			cmdmode()
 		else:
 			game.player.cmdext()
 
@@ -634,7 +636,20 @@ def show_help():
 		else:
 			print("Invalid command")
 			print("Objective\nCommands\nStats\nPotions\nHints\nExit")
-			
+	
+def cmdmode():
+	game.player.cheated = True
+	print("WARNING! You may ruin your save! Be careful!")
+	while True:
+		cmd = input("CMD>")
+		if cmd == "exit":
+			break
+		else:
+			try:
+				exec(cmd)
+			except:
+				traceback.print_exc()
+	
 def show_cheats():
 	print("WARNING! Cheats could break your save!\n")
 	print("Maxstamina\nStamfill\nMaxhealth\nHeal\nPotions\nHints\nEvents\nAreas\nExit")
@@ -1592,7 +1607,8 @@ def ext_redwind():
 	elif game.player.command == "south mine":
 		show_entry_message()
 	elif game.player.command == "river":
-		show_entry_message()
+		area_check(game.player.areas.river, river)
+		area_check(game.player.areas.river, river)
 	elif game.player.command == "library":
 		library()
 	else:
@@ -1909,29 +1925,37 @@ def forest():
 	else:
 		redwind()
 
-'''
+
 def en_river():
 	game.set_current_enemy(no_enemy)
 
 def ext_river():
 	def brewing():
-		print("~-< BREWING >-~")
-		print("Herbs = ", game.player.inventory.herbs.amount)
-		print("Small		= 3")
-		print("Medium		= 5")
-		print("Small		= 7")
-		print("Small		= 9")
-		if not game.player.strngerecipe:
-			print("Strange		= ?")
-		else:
-			print("Strange	= 50")
+		def herbamnt():
+			for item in game.player.inventory.items:
+				if item.type.name() == "Herb":
+					return item.amount
+		while True:
+			print("~-< BREWING >-~")
+			print("Herbs = ", herbamnt())
+			print("Small		= 3")
+			print("Medium		= 5")
+			print("Large		= 7")
+			print("Super		= 9")
+			'''
+			if not game.player.strangerecipe:
+				print("Strange		= ?")
+			else:
+				print("Strange	= 50")
+			'''
+			brewcmd = input()
 	if game.player.command in ["back", "return", "redwind"]:
 		redwind()
 	elif game.player.command == "brew":
-		if (not game.player.has_item(Item.herbs)):
+		if (not game.player.has_item(Item.herb)):
 			print("\"You don't have any herbs. Find some in the forest.\"")
 		else:
-			
+			brewing()
 	else:
 		show_entry_message()
 	
@@ -1959,7 +1983,6 @@ def river():
 	else:
 		pass
 	commands()
-'''
 		
 def en_final_battle():
 	game.set_current_enemy(no_enemy)
