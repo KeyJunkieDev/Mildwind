@@ -150,7 +150,7 @@ class Item(Enum):
 	iron				= "Iron Ore"
 	herb				= "Herb"
 	swamp_map			= "Map to Swamp"
-	stange_recipe		= "Strange potion recipe book"
+	strange_recipe		= "Strange potion recipe book"
 
 	def name(self):
 		return self.value
@@ -188,16 +188,8 @@ class Unlocked_areas():
 		#Bruce can turn scorpion shell into armor.
 		#Scorpion blood can be drank as special potion.
 		self.river				= False
-		#Bruce refers you to Dazzle. Enchant sword. Get directed other mine. Gives special potion.
-		#Player can come here to brew potions.
-		
-		#Display:
-		#Herbs: X
-		#Small		= 3 herbs
-		#Medium		= 5 herbs
-		#Large		= 7 herbs
-		#Super		= 9 herbs
-		#Strange	= ? herbs (50. Get recipe at library.)
+		#[DONE] Bruce refers you to Dazzle. Enchant sword. Get directed other mine. Gives special potion.
+		#[DONE] Player can come here to brew potions.
 		self.library			= False
 		#[DONE] Go here for translation book.
 		#[DONE] Also get scroll if 0.
@@ -234,6 +226,11 @@ class Player():
 		self.extattack		= 0
 		self.stamina		= 0
 
+		self.farmwait		= 30
+		
+		self.smetals		= False
+		self.metals			= False
+		self.forged			= False
 		self.strangeperm	= False
 		self.strangerecipe	= False
 		self.hasmap			= False
@@ -1897,6 +1894,11 @@ def library():
 		game.player.hasmap = True
 		game.player.give_item(Item.swamp_map)
 		game.player.areas.swamp = True
+	elif game.player.strangeperm == True and game.player.strangerecipe == False:
+		print("Hey! I found this recipe when I was cleaning out an old chest. You might need it.")
+		print("You were given a recipe for strange potions.")
+		game.player.strangerecipe = True
+		game.player.give_item(Item.strange_recipe)
 	else:
 		pass
 	commands()
@@ -1913,7 +1915,7 @@ def forest():
 		sys.stdout.write("\b" * (toolbar_width+1)) # return to start of line, after '['
 
 		for i in range(toolbar_width):
-			time.sleep(30)
+			time.sleep(game.player.farmwait)
 			sys.stdout.write("*")
 			sys.stdout.flush()
 		print("] DONE!")
@@ -1945,7 +1947,7 @@ def ext_river():
 			if not game.player.strangerecipe:
 				print("Strange		= ?")
 			else:
-				print("Strange	= 50")
+				print("Strange	= 45")
 			print("To exit, type \"return\"")
 			brewcmd = input("BREWING>").lower()
 			if brewcmd == "return":
@@ -1967,7 +1969,17 @@ def ext_river():
 				game.player.give_item(Potion.super, 1)
 				print("Super potion brewed.")
 			elif brewcmd == "strange":
-				print("Not done.")
+				if game.player.strangerecipe:
+					game.player.take_item(Item.herb, 45)
+					game.player.maxhealth += 35
+					game.player.maxstamina += 2
+					game.player.fullheal()
+					print("Your stamina and health increased.")
+				elif game.player.strangeperm:
+					print("You don't know that recipe.")
+				else:
+					print("\"I don't know the recipe for that yet. Maybe you can find it somewhere though.\"")
+					game.player.strangeperm = True
 			else:
 				print("Not a potion.")
 	if game.player.command in ["back", "return", "redwind"]:
