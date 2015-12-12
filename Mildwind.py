@@ -97,6 +97,7 @@ class Weapon(Enum):
 	dagger				= ("Old Dagger",		20)
 	broadsword			= ("Broadsword",		50)
 	machete				= ("Ancient Machete",	45)
+	dragon_slayer		= ("Dragon Slayer",		75)
 
 	def name(self):
 		return self.value[0]
@@ -181,8 +182,8 @@ class Unlocked_areas():
 		self.mountains			= False
 		#[DONE] Fight bear. Grab key.
 		self.northmine			= False
-		#Visit to gather materials to make a powerful sword.
-		#Go to Bruce. 
+		#[DONE] Visit to gather materials to make a powerful sword.
+		#[DONE] Go to Bruce. 
 		self.southmine			= False
 		#Come here for special ore. Fight scorpion.
 		#Bruce can turn scorpion shell into armor.
@@ -227,6 +228,7 @@ class Player():
 		self.stamina		= 0
 
 		self.farmwait		= 30
+		self.minewait		= 15
 		
 		self.smetals		= False
 		self.metals			= False
@@ -1598,16 +1600,15 @@ def ext_redwind():
 	elif game.player.command == "swamp":
 		show_entry_message()
 	elif game.player.command == "mountains":
-		mountains()
+		area_check(game.player.areas.mountains, mountains)
 	elif game.player.command == "north mine":
-		show_entry_message()
+		area_check(game.player.areas.northmine, northmine)
 	elif game.player.command == "south mine":
 		show_entry_message()
 	elif game.player.command == "river":
 		area_check(game.player.areas.river, river)
-		area_check(game.player.areas.river, river)
 	elif game.player.command == "library":
-		library()
+		area_check(game.player.areas.library, library)
 	else:
 		show_entry_message()
 
@@ -1674,14 +1675,27 @@ def bruce():
 		game.player.areas.library = True
 		redwind()
 	elif game.player.areas.forest == False and game.player.dracordTry:
-		print("Hm... You tried to beat Dracord and failed? How are you alive?")
+		print("\"Hm... You tried to beat Dracord and failed? How are you alive?\"")
 		time.sleep(3)
-		print("Ruffin's ghost? Wow.")
+		print("\"Ruffin's ghost? Wow.\"")
 		time.sleep(3)
-		print("Listen, I know an enchantress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.")
+		print("\"Listen, I know an enchantress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.\"")
+		time.sleep(4)
+		print("\"There's also a mine close by. Go there to gather the materials for a sword, and I'll forge them for you. Just head north.\"")
 		game.player.areas.forest = True
 		game.player.areas.river = True
+		game.player.areas.northmine = True
 		redwind()
+	elif game.player.metals and game.player.forged == False:
+		print("\"Great! You found all the iron we need!\"")
+		game.player.take_item(Item.iron, 5)
+		time.sleep(2)
+		print("A few hours later...")
+		time.sleep(3)
+		print("\"Here you go! It's ready for battle.\"")
+		print("You were given the Dragon Slayer sword.")
+		game.player.give_item(Weapon.dragon_slayer)
+		game.player.forged = True
 	else:
 		print("Bruce doesn't have anything to tell you.")
 		redwind()
@@ -1927,6 +1941,32 @@ def forest():
 	else:
 		redwind()
 
+def northmine():
+	if not game.player.metals:
+		print("You walk to the mine.")
+		time.sleep(2)
+		confirm = input("Would you like to mine for iron (y/n)?\n>")
+		if confirm == "y":
+			print("Mining...")
+			toolbar_width = 60
+			sys.stdout.write("[%s]" % (" " * toolbar_width))
+			sys.stdout.flush()
+			sys.stdout.write("\b" * (toolbar_width+1)) # return to start of line, after '['
+
+			for i in range(toolbar_width):
+				time.sleep(game.player.minewait)
+				sys.stdout.write("*")
+				sys.stdout.flush()
+			print("] DONE!")
+			game.player.metals = True
+			game.player.give_item(Item.iron, 5)
+			time.sleep(3)
+			redwind()
+		else:
+			redwind()
+	else:
+		print("You already have materials from this mine.")
+		redwind()
 
 def en_river():
 	game.set_current_enemy(no_enemy)
