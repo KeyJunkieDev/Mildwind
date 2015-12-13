@@ -150,6 +150,7 @@ class Item(Enum):
 	drazmite			= "Drazmite Ore"
 	iron				= "Iron Ore"
 	herb				= "Herb"
+	scorpion_shell		= "Scorpion Shell"
 	swamp_map			= "Map to Swamp"
 	strange_recipe		= "Strange potion recipe book"
 
@@ -230,8 +231,12 @@ class Player():
 		self.farmwait		= 30
 		self.minewait		= 15
 		
+		self.sshield		= False
 		self.smetals		= False
 		self.metals			= False
+		self.shell			= False
+		self.hassarmor		= False
+		self.sforged		= False
 		self.forged			= False
 		self.strangeperm	= False
 		self.strangerecipe	= False
@@ -1636,7 +1641,8 @@ def redwind():
 	available_areas(game.player.areas.library, "-Library")
 	commands()
 	#list of places to go to. I plan to have areas that unlock as you progress.
-	
+
+#bruce	
 def en_bruce():
 	game.set_current_enemy(no_enemy)
 	
@@ -1699,7 +1705,8 @@ def bruce():
 	else:
 		print("Bruce doesn't have anything to tell you.")
 		redwind()
-	
+
+#dracord		
 def en_dracord():
 	game.set_current_enemy(no_enemy)
 	
@@ -1758,6 +1765,7 @@ def dracord():
 		print("You're not ready to fight Dracord.")
 		redwind()
 
+#mountains
 def en_mountains():
 	game.set_current_enemy(no_enemy)
 		
@@ -1802,6 +1810,7 @@ def mountains():
 		print("After some time, you made it to a spot to rest. You find the skeleton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type \"climb\").")
 		commands()
 
+#mountains_1
 def en_mountains_1():
 	bear = Enemy("Guardian Bear", 150, (45, 65), 3)
 	bear.rewards = [(Potion.large, 2)]
@@ -1844,6 +1853,7 @@ def mountains_1():
 	print("You got to the entrance of the cave. Suddenly an armored bear; the Guardian Bear, jumps in front of you.")
 	commands()
 
+#mountains_2
 def en_mountains_2():
 	game.set_current_enemy(no_enemy)
 		
@@ -1869,7 +1879,7 @@ def mountains_2():
 	time.sleep(6)
 	redwind()
 	
-
+#library
 def en_library():
 	game.set_current_enemy(no_enemy)
 		
@@ -1916,7 +1926,8 @@ def library():
 	else:
 		pass
 	commands()
-	
+
+#forest	
 def forest():
 	print("You walk to the forest.")
 	time.sleep(2)
@@ -1941,6 +1952,7 @@ def forest():
 	else:
 		redwind()
 
+#northmine
 def northmine():
 	if not game.player.metals:
 		print("You walk to the mine.")
@@ -1968,6 +1980,90 @@ def northmine():
 		print("You already have materials from this mine.")
 		redwind()
 
+'''
+#southmine
+def en_southmine():
+	scorpion = Enemy("Scorpion", 750, (20, 40), 2)
+	scorpion.rewards = [(Potion.super, 2)]
+
+	scorpion.deadmsg = "You stare at the dead scorpion and watch it twitch."
+	scorpion.killedmsg = "You attacked the scorpion. He has been killed, and you have a health of {0}. You also picked up a few super potions."
+	scorpion.damagemsg = "You attacked the scorpion, but he poisoned you a bit. She has a health of {0}, and you have a health of {1}."
+	scorpion.deathmsg = "You were killed."
+
+	scorpion.shieldkilledmsg = "You safely deflected the scorpion's attacks and killed him. Your health is now {0} and you obtained 2 super potions."
+	scorpion.shieldmsg = "You deflected the scorpion's attack and he hurt himself in the process. You used some of your stamina in the process. Her health is {0} and yours is {1}."
+
+	scorpion.rundamagemsg = "The scorpion clawed you. Your health is now {1}. You can't leave until he's dead."
+
+	game.set_current_enemy(scorpion)
+	
+def ext_southmine():
+	if game.player.command == "shield":
+		game.player.use_shield(game.current_enemy)
+	elif game.player.command in ["attack", "fight", "a"]:
+		game.player.attack_enemy(game.current_enemy)
+		if game.current_enemy.dead:
+			game.player.armor = game.player.armorbank
+		else:
+			game.player.maxhealth -= 7
+			print("Your max health is now %s." % (game.player.maxhealth))
+	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		if game.player.run_from_enemy(game.current_enemy, [0]):
+			southmine_1()
+	else:
+		show_entry_message()
+
+def southmine():
+	game.player.savepos = southmine
+	save()
+	en_southmine()
+	log_stats("redwind")
+	game.player.randhint = ["Squash that scorpion! (attack)"]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.healthbank = game.player.maxhealth
+	game.player.cmdext = ext_southmine
+	if game.player.smetals:
+		print("There is no need to return here.")
+		redwind()
+	else:
+		print("You walk into the cave mine and see the dragmite ores. You approach them, but are interupted by a scorpion.")
+		commands()
+		
+#southmine_1
+def en_part10():
+	game.set_current_enemy(no_enemy)
+	
+def ext_part10():
+	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		print("You bravely walk into Dracord's lair.")
+		part11()
+	elif game.player.command in ["vase", "look in vase", "look in the vase"]:
+		if game.player.hasitems:
+			print("You look at the empty vase.")
+		else:
+			print("You look inside the vase. You found a few small potions.")
+			game.player.give_item(Potion.small, 2)
+			game.player.hasitems = True
+	else:
+		show_entry_message()
+	
+def part10():
+	game.player.savepos = part10
+	save()
+	en_part10()
+	log_stats("9")
+	game.player.randhint = ["What's in the vase?"]
+	game.player.maxhealth = game.player.healthbank
+	game.player.hasitems = False
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_part10
+	print("\nYou stop to rest. After a while, you feel reinvigorated. You hear snoring in the distance, it must be Dracord sleeping. As you stand up, you see a large vase.")
+	commands()
+'''
+	
 def en_river():
 	game.set_current_enemy(no_enemy)
 
