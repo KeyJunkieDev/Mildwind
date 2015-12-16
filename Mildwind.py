@@ -2084,7 +2084,7 @@ def ext_river():
 			if not game.player.strangerecipe:
 				print("Strange		= ?")
 			else:
-				print("Strange	= 45")
+				print("Strange		= 45")
 			print("To exit, type \"return\"")
 			brewcmd = input("BREWING>").lower()
 			if brewcmd == "return":
