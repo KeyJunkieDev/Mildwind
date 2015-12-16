@@ -1541,7 +1541,7 @@ def en_part13():
 	game.set_current_enemy(no_enemy)
 
 def ext_part13():
-	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow stream", "follow"]:
+	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow stream", "follow", "yes"]:
 		part14()
 	else:
 		show_entry_message()
@@ -1702,6 +1702,7 @@ def bruce():
 		print("You were given the Dragon Slayer sword.")
 		game.player.give_item(Weapon.dragon_slayer)
 		game.player.forged = True
+		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
 		redwind()
@@ -2089,28 +2090,58 @@ def ext_river():
 			if brewcmd == "return":
 				break
 			elif brewcmd == "small":
-				game.player.take_item(Item.herb, 3)
-				game.player.give_item(Potion.small, 1)
-				print("Small potion brewed.")
+				try:
+					if herbamnt() >= 3:
+						game.player.take_item(Item.herb, 3)
+						game.player.give_item(Potion.small, 1)
+						print("Small potion brewed.")
+					else:
+						print("Not enough herbs.")
+				except TypeError:
+					print("No herbs.")
 			elif brewcmd == "medium":
-				game.player.take_item(Item.herb, 5)
-				game.player.give_item(Potion.medium, 1)
-				print("Medium potion brewed.")
+				try:
+					if herbamnt() >= 5:
+						game.player.take_item(Item.herb, 5)
+						game.player.give_item(Potion.medium, 1)
+						print("Medium potion brewed.")
+					else:
+						print("Not enough herbs.")
+				except TypeError:
+					print("No herbs.")
 			elif brewcmd == "large":
-				game.player.take_item(Item.herb, 7)
-				game.player.give_item(Potion.large, 1)
-				print("Large potion brewed.")
+				try:
+					if herbamnt() >= 7:
+						game.player.take_item(Item.herb, 7)
+						game.player.give_item(Potion.large, 1)
+						print("Large potion brewed.")
+					else:
+						print("Not enough herbs.")
+				except TypeError:
+					print("No herbs.")
 			elif brewcmd == "super":
-				game.player.take_item(Item.herb, 9)
-				game.player.give_item(Potion.super, 1)
-				print("Super potion brewed.")
+				try:
+					if herbamnt() >= 9:
+						game.player.take_item(Item.herb, 9)
+						game.player.give_item(Potion.super, 1)
+						print("Super potion brewed.")
+					else:
+						print("Not enough herbs.")
+				except TypeError:
+					print("No herbs.")
 			elif brewcmd == "strange":
 				if game.player.strangerecipe:
-					game.player.take_item(Item.herb, 45)
-					game.player.maxhealth += 35
-					game.player.maxstamina += 2
-					game.player.fullheal()
-					print("Your stamina and health increased.")
+					try:	
+						if herbamnt() >= 45:
+							game.player.take_item(Item.herb, 45)
+							game.player.maxhealth += 35
+							game.player.maxstamina += 2
+							game.player.fullheal()
+							print("Your stamina and health increased.")
+						else:
+							print("Not enough herbs.")
+					except TypeError:
+						print("No herbs.")
 				elif game.player.strangeperm:
 					print("You don't know that recipe.")
 				else:
