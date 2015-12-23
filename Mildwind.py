@@ -564,7 +564,7 @@ def list_potion_types():
 
 def use_potion(type):
 	if (not game.player.has_item(type)):
-		print("You don't have any potions to use.")
+		print("You don't have any of that type of potion to use.")
 		return
 	if game.player.gethealth() >= game.player.maxhealth:
 		print("You already have max health.")
@@ -2022,7 +2022,7 @@ def ext_southmine():
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
 		else:
-			game.player.maxhealth -= 7
+			game.player.maxhealth -= 2
 			print("Your max health is now %s." % (game.player.maxhealth))
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [40]):
@@ -2050,8 +2050,6 @@ def ext_southmine():
 		show_entry_message()
 
 def southmine():
-	game.player.savepos = southmine
-	save()
 	en_southmine()
 	log_stats("redwind")
 	game.player.randhint = ["Squash that scorpion! (attack)"]
