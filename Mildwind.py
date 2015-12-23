@@ -110,6 +110,7 @@ class Armor(Enum):
 	prison_clothes		= ("Worn Prison Clothes",	1)
 	leather_armor		= ("Cheap Leather Armor",	1.5)
 	rusty_armor			= ("Rusty Old Armor",		1.4)
+	scorpio_armor		= ("Scorpio Armor",			2)
 
 	def name(self):
 		return self.value[0]
@@ -233,6 +234,7 @@ class Player():
 		self.farmwait		= 30
 		self.minewait		= 15
 		
+		self.sarmor			= False
 		self.sshield		= False
 		self.smetals		= False
 		self.metals			= False
@@ -1712,12 +1714,18 @@ def bruce():
 	elif game.player.smetals and game.player.forged and game.player.sforged == False:
 		print("What's this?")
 		time.sleep(2)
-		print("Ah. Dragmite! This mineral will greatly improve your sword. Let me forge this into it for you.")
-		game.player.take_item(Item.dragmite, 3)
+		print("Ah. Drazmite! This mineral will greatly improve your sword. Let me forge this into it for you.")
+		game.player.take_item(Item.drazmite, 3)
 		time.sleep(5)
 		print("Here you go! Better than ever.")
 		game.player.give_item(Weapon.dragon_slayer)
 		game.player.sforged = True
+		if game.player.shell:
+			print("Ah, you also brought back some scorpion shell! Let me make that into armor for you.")
+			time.sleep(5)
+			print("You now have Scorpio Armor!")
+			game.player.sarmor = True
+			game.player.give_item(Armor.scorpio_armor)
 		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
@@ -2029,7 +2037,7 @@ def ext_southmine():
 			southmine_1()
 	elif game.player.command == "scorpion shell":
 		if game.current_enemy.dead:
-			print("You pick up the scorpion shell.")
+			print("You pick up the scorpion shell. Maybe Bruce can turn it into armor.")
 			game.player.shell = True
 			game.player.give_item(Item.scorpion_shell)
 		else:
@@ -2061,7 +2069,7 @@ def southmine():
 		print("There is no need to return here.")
 		redwind()
 	else:
-		print("You walk into the cave mine and see the dragmite ores. You approach them, but are interupted by a scorpion.")
+		print("You walk into the cave mine and see the drazmite ores. You approach them, but are interupted by a scorpion.")
 		commands()
 		
 #southmine_1
@@ -2082,9 +2090,9 @@ def southmine_1():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_southmine_1
-	print("\nYou excitedly run to the dragmite ores. They seem to be loose enough to not have to mine at. You pick some up and return to the village.")
+	print("\nYou excitedly run to the drazmite ores. They seem to be loose enough to not have to mine at. You pick some up and return to the village.")
 	time.sleep(4)
-	game.player.give_item(Item.dragmite, 3)
+	game.player.give_item(Item.drazmite, 3)
 	game.player.smetals = True
 	redwind()
 	
