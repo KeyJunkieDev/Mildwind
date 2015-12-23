@@ -180,16 +180,17 @@ class Unlocked_areas():
 		#[DONE] Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
 		#[DONE] Make player wait 30 minutes. Get random amount of herbs.
 		self.swamp				= False
-		#Library gives you map to swamp. Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
+		#[DONE] Library gives you map to swamp.
+		#Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
 		self.mountains			= False
 		#[DONE] Fight bear. Grab key.
 		self.northmine			= False
 		#[DONE] Visit to gather materials to make a powerful sword.
 		#[DONE] Go to Bruce. 
 		self.southmine			= False
-		#Come here for special ore. Fight scorpion.
-		#Bruce can turn scorpion shell into armor.
-		#Scorpion blood can be drank as special potion.
+		#[DONE] Come here for special ore. Fight scorpion.
+		#[DONE] Bruce can turn scorpion shell into armor.
+		#[DONE] Scorpion blood can be drank as special potion.
 		self.river				= False
 		#[DONE] Bruce refers you to Dazzle. Enchant sword. Get directed other mine. Gives special potion.
 		#[DONE] Player can come here to brew potions.
@@ -413,7 +414,7 @@ class Enemy():
 		self.shieldkilledmsg 	= "You safely deflect the enemy's attacks and kill it."
 		self.shieldmsg			= "You deflect the enemy's attack and it hurts itself in the process. You used some of your stamina."
 		self.learnedmsg			= "The %s learned your moves and attacked you. Your health is now {0}" % (self.name.lower())
-		self.reachmsg			= "The %s was able to reach over your shield and stab you a bit. Your health is now {0}" % (self.name.lower())
+		self.reachmsg			= "The %s was able to reach over your shield and stab you a bit. Your health is now {0}." % (self.name.lower())
 
 		self.rundamagemsg		= "The %s attacked you." % (self.name.lower())
 		self.rundeathmsg		= "You were killed by the %s." % (self.name.lower())
@@ -1611,7 +1612,7 @@ def ext_redwind():
 	elif game.player.command == "north mine":
 		area_check(game.player.areas.northmine, northmine)
 	elif game.player.command == "south mine":
-		area_check(game.player.areas.southmine, river)
+		area_check(game.player.areas.southmine, southmine)
 	elif game.player.command == "river":
 		area_check(game.player.areas.river, river)
 	elif game.player.command == "library":
@@ -1677,6 +1678,9 @@ def bruce():
 		time.sleep(5)
 		print("\"Oh, I forgot to mention, if you need any help, check the library.\"")
 		time.sleep(3)
+		print("Here, take these small potions for your journey.")
+		game.player.give_item(Potion.small, 5)
+		time.sleep(2)
 		print("\"Farewell and good luck %s.\"" % (game.player.name))
 		time.sleep(4)
 		game.player.areas.dracordlair = True
@@ -1701,7 +1705,7 @@ def bruce():
 		print("A few hours later...")
 		time.sleep(3)
 		print("\"Here you go! It's ready for battle.\"")
-		print("You were given the Dragon Slayer sword.")
+		print("You were given the Hero Sword.")
 		game.player.give_item(Weapon.hero_sword)
 		game.player.forged = True
 		redwind()
@@ -1834,7 +1838,7 @@ def en_mountains_1():
 	bear.deathmsg = "You were mauled to death."
 
 	bear.shieldkilledmsg = "You safely deflected the bear's attacks and killed him. Your health is now {0} and you obtained two large potions (\"continue\")."
-	bear.shieldmsg = "You deflected the bear's attack and he hurt herself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
+	bear.shieldmsg = "You deflected the bear's attack and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
 
 	bear.rundamagemsg = "The bear clawed you. Your health is now {1}. You can't leave until he's dead."
 
