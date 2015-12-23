@@ -97,7 +97,8 @@ class Weapon(Enum):
 	dagger				= ("Old Dagger",		20)
 	broadsword			= ("Broadsword",		50)
 	machete				= ("Ancient Machete",	45)
-	dragon_slayer		= ("Dragon Slayer",		75)
+	hero_sword			= ("Hero Sword",		75)
+	dragon_slayer		= ("Dragon Slayer",		100)
 
 	def name(self):
 		return self.value[0]
@@ -235,6 +236,7 @@ class Player():
 		self.smetals		= False
 		self.metals			= False
 		self.shell			= False
+		self.strangeblood	= False
 		self.hassarmor		= False
 		self.sforged		= False
 		self.forged			= False
@@ -1609,7 +1611,7 @@ def ext_redwind():
 	elif game.player.command == "north mine":
 		area_check(game.player.areas.northmine, northmine)
 	elif game.player.command == "south mine":
-		show_entry_message()
+		area_check(game.player.areas.southmine, river)
 	elif game.player.command == "river":
 		area_check(game.player.areas.river, river)
 	elif game.player.command == "library":
@@ -1636,7 +1638,7 @@ def redwind():
 	available_areas(game.player.areas.swamp, "-Swamp")
 	available_areas(game.player.areas.mountains, "-Mountains")
 	available_areas(game.player.areas.northmine, "-North Mine")
-	available_areas(game.player.areas.southmine, "-south Mine")
+	available_areas(game.player.areas.southmine, "-South Mine")
 	available_areas(game.player.areas.river, "-River")
 	available_areas(game.player.areas.library, "-Library")
 	commands()
@@ -1700,8 +1702,18 @@ def bruce():
 		time.sleep(3)
 		print("\"Here you go! It's ready for battle.\"")
 		print("You were given the Dragon Slayer sword.")
-		game.player.give_item(Weapon.dragon_slayer)
+		game.player.give_item(Weapon.hero_sword)
 		game.player.forged = True
+		redwind()
+	elif game.player.smetals and game.player.forged and game.player.sforged == False:
+		print("What's this?")
+		time.sleep(2)
+		print("Ah. Dragmite! This mineral will greatly improve your sword. Let me forge this into it for you.")
+		game.player.take_item(Item.dragmite, 3)
+		time.sleep(5)
+		print("Here you go! Better than ever.")
+		game.player.give_item(Weapon.dragon_slayer)
+		game.player.sforged = True
 		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
@@ -1981,18 +1993,17 @@ def northmine():
 		print("You already have materials from this mine.")
 		redwind()
 
-'''
 #southmine
 def en_southmine():
 	scorpion = Enemy("Scorpion", 750, (20, 40), 2)
 	scorpion.rewards = [(Potion.super, 2)]
 
 	scorpion.deadmsg = "You stare at the dead scorpion and watch it twitch."
-	scorpion.killedmsg = "You attacked the scorpion. He has been killed, and you have a health of {0}. You also picked up a few super potions."
+	scorpion.killedmsg = "You attacked the scorpion. He has been killed, and you have a health of {0}. You also picked up a few super potions.\nYou notice that the scorpion shell looks kinda sturdy. The blood looks -strange-."
 	scorpion.damagemsg = "You attacked the scorpion, but he poisoned you a bit. She has a health of {0}, and you have a health of {1}."
 	scorpion.deathmsg = "You were killed."
 
-	scorpion.shieldkilledmsg = "You safely deflected the scorpion's attacks and killed him. Your health is now {0} and you obtained 2 super potions."
+	scorpion.shieldkilledmsg = "You safely deflected the scorpion's attacks and killed him. Your health is now {0} and you obtained 2 super potions.\nYou notice that the scorpion shell looks kinda sturdy. The blood looks -strange-."
 	scorpion.shieldmsg = "You deflected the scorpion's attack and he hurt himself in the process. You used some of your stamina in the process. Her health is {0} and yours is {1}."
 
 	scorpion.rundamagemsg = "The scorpion clawed you. Your health is now {1}. You can't leave until he's dead."
@@ -2010,8 +2021,27 @@ def ext_southmine():
 			game.player.maxhealth -= 7
 			print("Your max health is now %s." % (game.player.maxhealth))
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
-		if game.player.run_from_enemy(game.current_enemy, [0]):
+		if game.player.run_from_enemy(game.current_enemy, [40]):
 			southmine_1()
+	elif game.player.command == "scorpion shell":
+		if game.current_enemy.dead:
+			print("You pick up the scorpion shell.")
+			game.player.shell = True
+			game.player.give_item(Item.scorpion_shell)
+		else:
+			show_entry_message()
+	elif game.player.command in ["drink blood", "scorpion blood", "blood", "drink scorpion blood"]:
+		if game.player.strangeblood:
+			show_entry_message
+		else:	
+			if game.current_enemy.dead:
+				print("You drink the strange blood. You feel stronger.")
+				game.player.strangeblood = True
+				game.player.maxhealth += 15
+				game.player.maxstamina += 1
+				game.player.fullheal()
+			else:
+				show_entry_message()
 	else:
 		show_entry_message()
 
@@ -2033,37 +2063,28 @@ def southmine():
 		commands()
 		
 #southmine_1
-def en_part10():
+def en_southmine_1():
 	game.set_current_enemy(no_enemy)
 	
-def ext_part10():
-	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
-		print("You bravely walk into Dracord's lair.")
-		part11()
-	elif game.player.command in ["vase", "look in vase", "look in the vase"]:
-		if game.player.hasitems:
-			print("You look at the empty vase.")
-		else:
-			print("You look inside the vase. You found a few small potions.")
-			game.player.give_item(Potion.small, 2)
-			game.player.hasitems = True
-	else:
-		show_entry_message()
+def ext_southmine_1():
+	show_entry_message
 	
-def part10():
-	game.player.savepos = part10
+def southmine_1():
+	game.player.savepos = southmine_1
 	save()
-	en_part10()
-	log_stats("9")
-	game.player.randhint = ["What's in the vase?"]
+	en_southmine_1()
+	log_stats("southmine")
+	game.player.randhint = ["Beep"]
 	game.player.maxhealth = game.player.healthbank
 	game.player.hasitems = False
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
-	game.player.cmdext = ext_part10
-	print("\nYou stop to rest. After a while, you feel reinvigorated. You hear snoring in the distance, it must be Dracord sleeping. As you stand up, you see a large vase.")
-	commands()
-'''
+	game.player.cmdext = ext_southmine_1
+	print("\nYou excitedly run to the dragmite ores. They seem to be loose enough to not have to mine at. You pick some up and return to the village.")
+	time.sleep(4)
+	game.player.give_item(Item.dragmite, 3)
+	game.player.smetals = True
+	redwind()
 	
 def en_river():
 	game.set_current_enemy(no_enemy)
