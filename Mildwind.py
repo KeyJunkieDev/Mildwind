@@ -202,11 +202,11 @@ class Unlocked_areas():
 '''
 class Achievements():
 	def __init__(self):
-		#ID = ["achievement", "description"]
-		headbanger = ["Headbanger", "Bash your head into the wall"]
-		encounter = ["The Encounter", "Meet Ruffin"]
-		suicide = ["Suicide", "Kill yourself (the doppleghanger)"]
-		farmer = ["Farmer", "Gather herbs in the forest"]
+		#ID				= ["achievement", "description"]
+		headbanger		= ["Headbanger", "Bash your head into the wall"]
+		encounter		= ["The Encounter", "Meet Ruffin"]
+		suicide			= ["Suicide", "Kill yourself (the doppleghanger)"]
+		farmer			= ["Farmer", "Gather herbs in the forest"]
 '''
 		
 class Player():
