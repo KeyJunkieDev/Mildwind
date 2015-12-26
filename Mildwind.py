@@ -1608,7 +1608,7 @@ def ext_redwind():
 	elif game.player.command == "forest":
 		area_check(game.player.areas.forest, forest)
 	elif game.player.command == "swamp":
-		show_entry_message()
+		area_check(game.player.areas.swamp, swamp)
 	elif game.player.command == "mountains":
 		area_check(game.player.areas.mountains, mountains)
 	elif game.player.command == "north mine":
@@ -1790,6 +1790,139 @@ def dracord():
 		print("You're not ready to fight Dracord.")
 		redwind()
 
+#swamp
+def en_swamp():
+	turtle = Enemy("Giant Turtle", 50, (5, 30), 5)
+	bear.rewards = [(Potion.medium, 1)]
+
+	turtle.deadmsg = "I like turtles."
+	turtle.killedmsg = "You attacked the giant turtle. It was hard. You have a health of {0}. You also picked up a medium potion."
+	turtle.damagemsg = "You attacked the giant turtle, but he clawed you back. He has a health of {0}, and you have a health of {1}."
+	turtle.deathmsg = "You were mauled to death."
+
+	turtle.shieldkilledmsg = "You safely deflected the turtle's attacks and killed him. Your health is now {0} and you obtained a medium potion."
+	turtle.shieldmsg = "You deflected the giant turtle's attack and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
+
+	turtle.rundamagemsg = "The giant turtle clawed you. Your health is now {1}. You can't leave until he's dead."
+
+	game.set_current_enemy(turtle)
+	
+def ext_swamp():
+	if game.player.command == "shield":
+		game.player.use_shield(game.current_enemy)
+	elif game.player.command in ["attack", "fight", "a"]:
+		game.player.attack_enemy(game.current_enemy)
+	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		if game.player.run_from_enemy(game.current_enemy, [0, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 75]):
+			swamp_1()
+	else:
+		show_entry_message()
+	
+def swamp():
+	en_swamp()
+	log_stats("redwind")
+	game.player.randhint = ["You like turtles, don't you?"]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_swamp
+	if game.player.sshield:
+		print("As you walk towards the swamp, you hear someone yell \"STAY OUT OF MY SWAMP\" in the distance. You turn around and return to the village.")
+		time.sleep(3)
+		redwind()
+	else:
+		print("You begin to follow the map to see where it takes you.")
+		time.sleep(4)
+		print("On your way down the path, there is giant turtle in the way. You try to move him.")
+		time.sleep(3)
+		print("It got angry and turned to you and begins to fight.")
+		commands()
+
+#swamp_1
+def en_swamp_1():
+	trolls = Enemy("Tribe of Trolls", 500, (1, 75), 1)
+	trolls.rewards = [(Potion.small, 4)]
+
+	trolls.deadmsg = "You look at the dead trolls."
+	trolls.killedmsg = "You killed the trolls. You have a health of {0}. You also picked up 4 small potions."
+	trolls.damagemsg = "You attacked the trolls, but they stabbed you back. they have a collective health of {0}, and you have a health of {1}."
+	trolls.deathmsg = "You were stabbed to death."
+
+	trolls.shieldkilledmsg = "You safely deflected the trolls' attacks and killed them. Your health is now {0} and you obtained small potions."
+	trolls.shieldmsg = "You deflected the trolls' attacks and they hurt themselves in the process. You used some of your stamina in the process. Their collective health is {0} and yours is {1}."
+
+	trolls.rundamagemsg = "The trolls stabbed you. Your health is now {1}. You can't leave until they're dead."
+
+	game.set_current_enemy(trolls)
+	
+def ext_swamp_1():
+	if game.player.command == "shield":
+		game.player.use_shield(game.current_enemy)
+	elif game.player.command in ["attack", "fight", "a"]:
+		game.player.attack_enemy(game.current_enemy)
+	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		if game.player.run_from_enemy(game.current_enemy, [0, 25, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 75, 75, 75, 75, 75, 85, 85, 85, 85, 85, 85, 85, 85, 85, 100]):
+			swamp_2()
+	else:
+		show_entry_message()
+	
+def swamp_1():
+	en_swamp_1()
+	log_stats("swamp")
+	game.player.randhint = ["Get rekt m8."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_swamp_1
+	time.sleep(5)
+	print("You Continue on your path to this mysterious destination.")
+	time.sleep(3)
+	print("A tribe of angry trolls jump ouf of the bushes and from the trees. They don't like your presence. They begin to run towards you.")
+	commands()
+
+'''	
+#swamp_2
+def en_swamp_2():
+	chief = Enemy("Troll Chief", 300, (45, 75), 1.5)
+	chief.rewards = [(Potion.large, 2)]
+
+	chief.deadmsg = "You take the fur to use as a coat."
+	chief.killedmsg = "You killed the bear. You have a health of {0}. You also picked up a large potion or two (\"continue\")."
+	chief.damagemsg = "You attacked the bear, but he clawed you back. He has a health of {0}, and you have a health of {1}."
+	chief.deathmsg = "You were mauled to death."
+
+	chief.shieldkilledmsg = "You safely deflected the bear's attacks and killed him. Your health is now {0} and you obtained two large potions (\"continue\")."
+	chief.shieldmsg = "You deflected the bear's attack and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
+
+	chief.rundamagemsg = "The bear clawed you. Your health is now {1}. You can't leave until he's dead."
+
+	game.set_current_enemy(chief)
+	
+def ext_swamp_2():
+	if game.player.command == "shield":
+		game.player.use_shield(game.current_enemy)
+	elif game.player.command in ["attack", "fight", "a"]:
+		game.player.attack_enemy(game.current_enemy)
+	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		if game.player.run_from_enemy(game.current_enemy, [0, 25, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 75, 75, 75, 75, 75, 75, 75, 75, 100]):
+			mountains_2()
+	else:
+		show_entry_message()
+	
+def swamp_2():
+	game.player.savepos = mountains_1
+	save()
+	en_mountains_1()
+	log_stats("mountains")
+	game.player.randhint = ["Hints tend to be useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.cmdext = ext_mountains_1
+	time.sleep(5)
+	print("You make it to the top of the mountain. The cave is just ahead. You begin to approach it.")
+	time.sleep(3)
+	print("You got to the entrance of the cave. Suddenly an armored bear; the Guardian Bear, jumps in front of you.")
+	commands()
+'''
+		
 #mountains
 def en_mountains():
 	game.set_current_enemy(no_enemy)
