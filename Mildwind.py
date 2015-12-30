@@ -303,7 +303,7 @@ class Player():
 			enemy.hurt(self.get_attack_damage() / enemy.armor)
 			if enemy.dead:
 				self.give_items(enemy.rewards)
-				print(enemy.killedmsg.format(self.gethealth()))
+				talking(enemy.killedmsg.format(self.gethealth()))
 			else:
 				damage = enemy.random_attack()
 				self.hurt(damage, True, enemy.damagemsg.format(enemy.health, "{1}"), enemy.deathmsg, enemy.ending)
@@ -556,15 +556,37 @@ def printingtoggle():
 		talking("Printing is on.", .04)
 	else:
 		print("Printing is off.")
-			
-def talking(phrasetext, texttime):
+
+def talking(phrasetext, texttime=.03):
 	for i in str(phrasetext):
 		if game.player.printer:
 			time.sleep(texttime)
 		sys.stdout.write(i)
 		sys.stdout.flush()
+		if i in [".", "!", "?", ":"]:
+			time.sleep(texttime*10)
+		elif i in [",", ";"]:
+			time.sleep(texttime*3)
+	time.sleep(.75)
 	print()
-			
+	
+def talking_TEST_DO_NOT_REMOVE(phrasetext, texttime=.03):
+	p = [".", "!", "?", ":"]
+	p2 = [",", ";"]
+	for i, c in enumerate(str(phrasetext)):
+		nc = phrasetext[i]
+		if game.player.printer:
+			time.sleep(texttime)
+		sys.stdout.write(c)
+		sys.stdout.flush()
+		if nc not in ["\""] and nc not in p and nc not in p2:
+			if c in p:
+				time.sleep(texttime * 10)
+			elif c in p2:
+				time.sleep(texttime * 3)
+	time.sleep(.75)
+	print()
+
 def show_credits():
 	print(credits)
 
@@ -577,7 +599,7 @@ def use_hint():
 		talking(random.choice(game.player.randhint), .02)
 		print("You have %s scroll(s) left." % (game.player.get_item_amount(Item.scroll)))
 	else:
-		talking("You don't have any scrolls to use.", .03)
+		talking("You don't have any scrolls to use.")
 
 def list_potion_types():
 	print("Potion Commands:\nSmall Potion:\n spot\n smallpot\n smallpotion\n small potion\nMedium Potions:\n mpot\n medpot\n mediumpot\n medpotion\n mediumpotion\n medium potion\nLarge Potions:\n lpot\n lrgpot\n largepot\n lrgpotion\n largepotion\n large potion\nSuper Potions:\n sppot\n suppot\n superpot\n suppotion\n superpotion\n super potion\n")
@@ -678,7 +700,7 @@ def cmdmode():
 				traceback.print_exc()
 	
 def show_cheats():
-	print("WARNING! Cheats could break your save!\n")
+	talking("WARNING! Cheats could break your save!\n", 0.02)
 	print("Maxstamina\nStamfill\nMaxhealth\nHeal\nPotions\nHints\nEvents\nAreas\nExit")
 	game.player.cheated = True
 	while True:
@@ -820,10 +842,10 @@ def change_name():
 		check = input("Are you sure? (y/n)\n>").lower()
 		if check == "y":
 			game.player.name = newname
-			talking("Your name is now %s" % (game.player.name), .03)
+			talking("Your name is now %s" % (game.player.name))
 			break
 		else:
-			print("Name left unchanged")
+			talking("Name left unchanged.")
 			break
 			
 def quit():
@@ -834,7 +856,7 @@ def quit():
 		else:
 			print("Resuming game.")
 			break
-			
+
 def show_survey():
 	input("When doing this survey, remember to be very descriptive, and you can't press enter to add a new paragraph. Enter goes to the next question.")
 	survey1 = input("On a scale of 1 - 10, what do you think of Mildwind so far?\n>")
@@ -928,11 +950,11 @@ def log_stats(part):
 	
 #tutorial
 def tutorial():
-	talking("Welcome to Mildwind! In this tutorial, I will guide you on how the basics of how the game works.", .04)
+	talking("Welcome to Mildwind! In this tutorial, I will guide you on how the basics of the game work.", .04)
 	while True:
-		tuthint = input("Firstly, let's show you what to do when you're stuck. When you don't know what to do, just type \"hint\". Using the hint command will subtract one hint from your stats. In the game, hints are also known as scrolls. You can find them throughout Mildwind. Use \"hint\" now.\n>").lower()
+		tuthint = input("Firstly, let's show you what to do when you're stuck. When you don't know what to do, just type \"hint\". Using the hint command will subtract one hint from your stats. Hints are also known as scrolls. You can find them throughout Mildwind. Use \"hint\" now.\n>").lower()
 		if tuthint == "hint":
-			talking("Great! You just used a hint (This hint use will not count against you in the actual game).", .03)
+			talking("Great! You just used a hint. (This hint use will not count against you in the actual game)")
 			print("You have 2 hint(s) left.")
 			break
 		else:
@@ -952,8 +974,8 @@ def tutorial():
 		else:
 			talking("That's not how you use attacks. Try again (Type \"attack\").", .04)
 	while True:
-		tutgeneral = input("Sometimes the game won't tell you what to do, for instance: \"There is a door in front of you.\" What do you think you have to do here?\n>").lower()
-		if tutgeneral in ["door", "open door"]:
+		tutgeneral = input("Sometimes the game won't tell you what to do. For instance: \"There is a door in front of you.\" What do you think you have to do here?\n>").lower()
+		if tutgeneral in ["door", "open door", "open the door"]:
 			talking("You opened the door and went into the next room.", .05)
 			talking("Good! When playing Mildwind, be sure to read carefully. You may need to do certain actions to get things you may need. In some instances, you won't even be able to progress without trying to figure out what to do on your own. If you ever get stuck, remember to use \"hint\", but also know that hints are limited.", .05)
 			break
@@ -1006,10 +1028,10 @@ def ext_part1():
 			game.player.maxhealth += 5
 			talking("\"Greetings %s, today is my last day alive... I must face my death sentence... Take these. They won't be of use to me in my afterlife.\"" % (game.player.name), .05)
 			if game.player.stolen:
-				talking("\"Heh, I saw what you did back there.\"", .03)
+				talking("\"Heh, I saw what you did back there.\"")
 				game.player.maxhealth = game.player.maxhealth + 5
 			if game.player.headbanger:
-				talking("\"I see that your head is bleeding...take this bandage.\" Your health is now restored to max.", .03)
+				talking("\"I see that your head is bleeding...take this bandage.\" Your health is now restored to max.")
 				game.player.fullheal()
 			talking("You were given 2 small potions and a mysterious one. The prisoner recommended that you drink the mysterious one, so you did. Your max health increased a little.", .04)
 	elif game.player.command == "wait":
@@ -1030,7 +1052,7 @@ def ext_part1():
 			if game.player.hints > 0:
 				game.player.hints = game.player.hints - 1
 		else:	
-			talking("As the guard passes by, you reach in his pocket and grabbed some items. You found a dagger, scroll, and key.", .03)
+			talking("As the guard passes by, you reach in his pocket and grabbed some items. You found a dagger, scroll, and key.")
 			game.player.give_item(Item.scroll)
 			game.player.give_item(Weapon.dagger)
 			game.player.give_item(Item.prison_key)
@@ -1040,7 +1062,7 @@ def ext_part1():
 			game.player.take_item(Item.prison_key)
 			part1_1()
 		else:
-			print("You don't have a key.")
+			talking("You don't have a key.")
 	else:
 		show_entry_message()
 
@@ -1049,14 +1071,14 @@ def part1():
 	save()
 	game.player.cmdext = ext_part1
 	game.player.randhint = ["Maybe the guard has something of use?", "Wait for something to happen?", "Maybe the prisoner has something to say?", "The door can be unlocked.", "I guess all you can do is bash your head against the wall."]
-	talking("\nYou awaken in a dungeon. Behind you is a tiny barred window, and in front of you is a locked, barred door. There is a prisoner in the cell across from you and a guard that marches back and forth in the halls.", .03)
+	talking("\nYou awaken in a dungeon. Behind you is a tiny barred window, and in front of you is a locked, barred door. There is a prisoner in the cell across from you and a guard that marches back and forth in the halls.")
 	game.player.ruffindead = False
 	commands()
 
 #part1_1
 def ext_part1_1():
 	if game.player.command == "run":
-		print("As you run, a man comes from behind and kills the guard. The man says \"Follow me, %s!\", and you run to the exit." % (game.player.name))
+		talking("As you run, a man comes from behind and kills the guard. The man says \"Follow me, %s!\", and you run to the exit." % (game.player.name))
 		part2()
 	elif game.player.command in ["attack", "fight", "a"]:
 		game.player.attack_enemy(game.current_enemy)
@@ -1077,7 +1099,7 @@ def part1_1():
 	game.player.randhint = ["RUN MAN."]
 	game.player.cmdext = ext_part1_1
 	en_part1()
-	print("You open the door. The guard sees you and begins to run towards you. What do you do?")
+	talking("You open the door. The guard sees you and begins to run towards you. What do you do?")
 	commands()
 	
 #part2
@@ -1086,7 +1108,7 @@ def en_part2():
 
 def ext_part2():
 	if game.player.command in ["yes", "walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
-		print("You follow Ruffin to the Dungeon that the dragon resides in.")
+		talking("You follow Ruffin to the Dungeon that the dragon resides in.")
 		part3()
 	elif game.player.command in ["run free", "no"]:
 		print("You are a free man now.")
@@ -1106,11 +1128,11 @@ def part2():
 	game.player.extattack = 15
 	game.player.hasitems = False
 	game.player.stolen = False
-	print("\nYou just escaped the dungeon, you meet the man who helped you escape. \"%s, you are the world's only hope of defeating the dragon Dracord. Dracord has risen from the dead thanks to a curse casted upon the world. My name is Ruffin and the prophecy says that you can save humanity, that is why I saved you. Will you please follow me and help me defeat the dragon?\"" % (game.player.name))
+	talking("\nYou just escaped the dungeon, you meet the man who helped you escape. \"%s, you are the world's only hope of defeating the dragon Dracord. Dracord has risen from the dead thanks to a curse casted upon the world. My name is Ruffin and the prophecy says that you can save humanity, that is why I saved you. Will you please follow me and help me defeat the dragon?\"" % (game.player.name))
 	if game.player.headbanger:
-		print("\"Also, what is up with your face? You look like you bashed your head into a wall.\"")
+		talking("\"Also, what is up with your face? You look like you bashed your head into a wall.\"")
 	if game.player.name == "Keyboard-Junkie":
-		print("\"While I was coming for you, I found this.\" Ruffin handed you a black cube with \"KJ\" engraved into it. You feel a breeze through your body. You max health, stamina, and strength increased.")
+		talking("\"While I was coming for you, I found this.\" Ruffin handed you a black cube with \"KJ\" engraved into it. You feel a breeze through your body. You max health, stamina, and strength increased.")
 		game.player.maxhealth += 50
 		game.player.fullheal()
 		game.player.maxstamina += 5
@@ -1139,10 +1161,10 @@ def en_part3():
 def ext_part3():
 	if game.player.command in ["torch", "use torch", "wave torch", "scare"]:
 		if game.player.has_item(Item.torch):
-			print("You wave your torch at the wolves to scare them off. You continue your journey.")
+			talking("You wave your torch at the wolves to scare them off. You continue your journey.")
 			part4()
 		else:
-			print("You don't have a torch.")
+			talking("You don't have a torch.")
 	elif game.player.command in ["shake", "shake wolf off", "shake off wolf", "shake off"]:
 		if game.player.haswolf:
 			game.player.haswolf = False
@@ -1151,7 +1173,7 @@ def ext_part3():
 			show_entry_message()
 	elif game.player.command in ["attack", "fight", "a"]:
 		if game.current_enemy.dead:
-			print("You and Ruffin look at the dead wolf pack.")
+			talking("You and Ruffin look at the dead wolf pack.")
 		else:
 			if game.player.haswolf:
 				damagemsg = "The wolf is still stuck to your arm, you cannot attack. You lost some health in the process. Your health is now %s. Shake him off."
@@ -1174,7 +1196,7 @@ def part3():
 	log_stats("2")
 	game.player.randhint = ["Try to fight your way out.", "Once you've killed em off, maybe you can press forward.", "Wolves hate fire."]
 	game.player.cmdext = ext_part3
-	print("\nYou have chosen to follow Ruffin. On your way to the cave that Dracord resides in, you are stopped by a pack of wolves. \"Wolves! If I remember correctly, wolves are afraid of fire!\" Ruffin noted.")
+	talking("\nYou have chosen to follow Ruffin. On your way to the cave that Dracord resides in, you are stopped by a pack of wolves. \"Wolves! If I remember correctly, wolves are afraid of fire!\" Ruffin noted.")
 	game.player.haswolf = False
 	commands()
 		
@@ -1185,10 +1207,10 @@ def en_part4():
 def ext_part4():
 	if game.player.command == "ponies!!!":
 		game.player.extattack += 15
-		print("You found a purple princess pony. She will now follow you and add 15 damage to your attacks.")
+		talking("You found a purple princess pony. She will now follow you and add 15 damage to your attacks.")
 	elif game.player.command in ["skeleton", "examine skeleton", "examine", "check", "check skeleton", "loot", "loot skeleton", "look at skeleton", "scavenge", "scavenge skeleton"]:
 		if game.player.hasitems:
-			print("You mourn over the death of the knight.")
+			talking("You mourn over the death of the knight.")
 		else:
 			game.player.maxstamina = 0
 			game.player.maxstamina = game.player.maxstamina + 3
@@ -1196,14 +1218,14 @@ def ext_part4():
 			game.player.hasitems = True
 			game.player.give_item(Shield.wooden_shield)
 			game.player.give_item(Armor.rusty_armor)
-			print("The skeleton has rusty old armor and wooden shield. Your armor is now increased to 1.4. You can now use \"shield\" to defend yourself from enemies and give a small amount of damage.")
+			talking("The skeleton has rusty old armor and wooden shield. Your armor is now increased to 1.4. You can now use \"shield\" to defend yourself from enemies and give a small amount of damage.")
 	elif game.player.command == "shield":
 		if game.player.shield == Shield.none:
-			print("You don't have a shield.")
+			talking("You don't have a shield.")
 		else:
-			print("\"Don't swing that like a madman!\" Ruffin complained.")
+			talking("\"Don't swing that like a madman!\" Ruffin complained.")
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
-		print("You and Ruffin continue into the dark cave.")
+		talking("You and Ruffin continue into the dark cave.")
 		part5()
 	else:
 		show_entry_message()
@@ -1214,7 +1236,7 @@ def part4():
 	log_stats("3")
 	game.player.randhint = ["\"I wonder what the skeleton left behind.\" Ruffin thought.", "You can move along if you wish."]
 	game.player.cmdext = ext_part4
-	print("\nYou make it to the entrance of the cave. You and Ruffin walk inside. There is a skeleton to the right and the darkness of the cave ahead.")
+	talking("\nYou make it to the entrance of the cave. You and Ruffin walk inside. There is a skeleton to the right and the darkness of the cave ahead.")
 	game.player.hasshield = False
 	commands()
 	
@@ -1224,8 +1246,8 @@ def en_part5():
 
 def ext_part5():
 	if game.player.command in ["dodge", "duck"]:
-		print("You dodged the incoming arrows as you ran to the end of the trap, but Ruffin...Ruffin was hit by an arrow in the stomach... He limped towards you, then leaned against the wall. You walk up to Ruffin. \"%s, I won't make it...you'll have to defeat Dracord without me... Here, take this...it will greatly assist you in your journey.\" He weakly handed you his broadsword...immediately after, his body collapsed.\nYou get up from your knees. You slowly progress further into the cave." % (game.player.name))
-		print("Before you left Ruffin's lifeless body, you grabbed 2 medium potions from him. You also found a mysterious potion and drank it. Your max health increased.")
+		talking("You dodged the incoming arrows as you ran to the end of the trap, but Ruffin...Ruffin was hit by an arrow in the stomach... He limped towards you, then leaned against the wall. You walk up to Ruffin. \"%s, I won't make it...you'll have to defeat Dracord without me... Here, take this...it will greatly assist you in your journey.\" He weakly handed you his broadsword...immediately after, his body collapsed.\nYou get up from your knees. You slowly progress further into the cave." % (game.player.name), 0.1)
+		talking("Before you left Ruffin's lifeless body, you grabbed 2 medium potions from him. You also found a mysterious potion and drank it. Your max health increased.")
 		game.player.ruffindead = True
 		game.player.extattack -= 15
 		game.player.give_item(Potion.medium, 2)
@@ -1236,9 +1258,9 @@ def ext_part5():
 		if game.player.shield == Shield.none:
 			print("You don't have a shield.")
 		else:
-			print("You and Ruffin walk right through the arrows without getting hit and make it to the end. \"%s, thank you for helping me get through with the shield. Here, I want to give you these.\"" % (game.player.name))
-			print("Ruffin handed you a machete that he says was passed down to him through family generations. He also handed you 2 medium potions and anther mysterious potion. You drink the mysterious potion. Your max health increased a little.")
-			print("You and Ruffin continue on after a short break of relief.")
+			talking("You and Ruffin walk right through the arrows without getting hit and make it to the end. \"%s, thank you for helping me get through with the shield. Here, I want to give you these.\"" % (game.player.name))
+			talking("Ruffin handed you a machete that he says was passed down to him through family generations. He also handed you 2 medium potions and anther mysterious potion. You drink the mysterious potion. Your max health increased a little.")
+			talking("You and Ruffin continue on after a short break of relief.")
 			game.player.give_item(Potion.medium, 2)
 			game.player.give_item(Weapon.machete)
 			game.player.maxhealth += 5
@@ -1255,7 +1277,7 @@ def part5():
 	log_stats("4")
 	game.player.randhint = ["Ruffin CAN'T die."]
 	game.player.cmdext = ext_part5
-	print("\n\"%s, watch out!\" Ruffin tried to warn you about the pressure plate, but it was too late. Arrows are headed in your direction. What do you do?" % (game.player.name))
+	talking("\n\"%s, watch out!\" Ruffin tried to warn you about the pressure plate, but it was too late. Arrows are headed in your direction. What do you do?" % (game.player.name))
 	commands()
 
 #part6
@@ -1292,7 +1314,7 @@ def part6():
 	log_stats("5")
 	game.player.randhint = ["Try to fight your way out.", "Once you've killed it off, maybe you can press forward.", "Do you have a shield?"]
 	game.player.cmdext = ext_part6
-	print("\nYou walked past a series of already-looted skeletons of soldiers just like you. You feel a breeze pass you, when suddenly one of the soldiers seemingly awakens from the dead and begins to run towards you alarmingly fast.")
+	talking("\nYou walked past a series of already-looted skeletons of soldiers just like you. You feel a breeze pass you, when suddenly one of the soldiers seemingly awakens from the dead and begins to run towards you alarmingly fast.")
 	commands()
 
 #part7
@@ -1305,21 +1327,21 @@ def en_part7():
 
 def ext_part7():
 	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
-		print("You finish relaxing and continue deeper into the cave.")
+		talking("You finish relaxing and continue deeper into the cave.")
 		part8()
 	elif game.player.command == "place torch":
 		if game.player.has_item(Item.torch):
-			print("You placed the torch onto the holder. It opened a secret path. You walk through it.")
-			print("You skipped two fights.")
+			talking("You placed the torch onto the holder. It opened a secret path. You walk through it.")
+			talking("You skipped two fights.")
 			game.player.healthbank = game.player.maxhealth
 			part10()
 		else:
-			print("You do not have a torch.")
+			talking("You do not have a torch.")
 	elif game.player.command in ["chest", "open chest"]:
 		if game.player.hasitems:
-			print("You look at the empty chest.")
+			talking("You look at the empty chest.")
 		else:
-			print("You open the chest. Inside, you find a large stamina potion. You drink it. Your max stamina increased.")
+			talking("You open the chest. Inside, you find a large stamina potion. You drink it. Your max stamina increased.")
 			game.player.maxstamina += 2
 			game.player.stamina = game.player.maxstamina
 			game.player.hasitems = True
@@ -1386,7 +1408,7 @@ def part8():
 	game.player.cmdext = ext_part8
 	game.player.armorbank = game.player.armor
 	game.player.armor = Armor.prison_clothes
-	print("\nYou hear crying down the hall. When you turn down the corner, you spot a crying child. When you walk up to him and touch his shoulder, suddenly he grows to your size. When he turns around, he's faceless.\n\"I WANT YOUR FACE!\"\nA curse was casted on you. You cannot use your armor.\nYou jump back. What now?")
+	talking("\nYou hear crying down the hall. When you turn down the corner, you spot a crying child. When you walk up to him and touch his shoulder, suddenly he grows to your size. When he turns around, he's faceless.\n\"I WANT YOUR FACE!\"\nA curse was casted on you. You cannot use your armor.\nYou jump back. What now?")
 	game.player.shielduse = 1
 	commands()
 	
@@ -1434,7 +1456,7 @@ def part9():
 	game.player.shielduse = 0
 	game.player.healthbank = game.player.maxhealth
 	game.player.cmdext = ext_part9
-	print("\nYou continue down the path in fear and confusion. You hear a hissing sound. Suddenly a spider falls in front of you and spits her fangs in your face.")
+	talking("\nYou continue down the path in fear and confusion. You hear a hissing sound. Suddenly a spider falls in front of you and spits her fangs in your face.")
 	commands()
 
 #part10
@@ -1443,13 +1465,13 @@ def en_part10():
 	
 def ext_part10():
 	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
-		print("You bravely walk into Dracord's lair.")
+		talking("You bravely walk into Dracord's lair.")
 		part11()
 	elif game.player.command in ["vase", "look in vase", "look in the vase", "loot", "loot vase"]:
 		if game.player.hasitems:
-			print("You look at the empty vase.")
+			talking("You look at the empty vase.")
 		else:
-			print("You look inside the vase. You found a few small potions.")
+			talking("You look inside the vase. You found a few small potions.")
 			game.player.give_item(Potion.small, 2)
 			game.player.hasitems = True
 	else:
@@ -1466,7 +1488,7 @@ def part10():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_part10
-	print("\nYou stop to rest. After a while, you feel reinvigorated. You hear snoring in the distance, it must be Dracord sleeping. As you stand up, you see a large vase.")
+	talking("\nYou stop to rest. After a while, you feel reinvigorated. You hear snoring in the distance, it must be Dracord sleeping. As you stand up, you see a large vase.")
 	commands()
 
 #part11	
@@ -1479,26 +1501,26 @@ def ext_part11():
 	if game.player.command == "shield":
 		if game.player.ruffindead:
 			game.player.sethealth(0, "You begin to hold up your shield. As soon as you raise it, Dracord whips it out of your hands with his tail and claws you to death.")
-			print(dracord_hint)
+			talking(dracord_hint)
 		else:
-			print("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord feels him climbing up him like a flea and smacks his tail into the ground to shake Ruffin off. Ruffin hits the ground hard.")
-			print("")
-			print("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
-			print("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
-			print("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you can attack, he flies up and breaks through the ceiling. Rubble begins to fall and causes the ground to collapse. You fall through and everything goes black...")
+			talking("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord feels him climbing up him like a flea and smacks his tail into the ground to shake Ruffin off. Ruffin hits the ground hard.")
+			talking("")
+			talking("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
+			talking("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
+			talking("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you can attack, he flies up and breaks through the ceiling. Rubble begins to fall and causes the ground to collapse. You fall through and everything goes black...")
 			game.player.ruffindead = True
 			input("Wake up (Press enter).")
 			part12()
 	elif game.player.command in ["attack", "fight", "a"]:
 		if game.player.ruffindead:
 			game.player.sethealth(0, "With no other option, you begin to charge towards Dracord without regret. Dracord slams you into the rocky walls and kills you.")
-			print(dracord_hint)
+			talking(dracord_hint)
 		else:
-			print("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climp up his tail. Dracord felt him climbing up him like a flea and smacked his tail into the ground to shake Ruffin off. Ruffin hit the ground hard.")
-			print("")
-			print("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
-			print("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
-			print("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you could attack, he flew up and broke through the ceiling. Rubble began to fall and caused the ground to collapse. You fall through and everything goes black...")
+			talking("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climp up his tail. Dracord felt him climbing up him like a flea and smacked his tail into the ground to shake Ruffin off. Ruffin hit the ground hard.")
+			talking("")
+			talking("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
+			talking("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
+			talking("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you could attack, he flew up and broke through the ceiling. Rubble began to fall and caused the ground to collapse. You fall through and everything goes black...")
 			game.player.ruffindead = True
 			input("Wake up (Press enter).")
 			part12()
@@ -1517,7 +1539,7 @@ def part11():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_part11
-	print("\nYou walk down the hallway towards the snoring. It gets louder as you approach it. You stop in front of a pair of stone doors and pull the chain to open it. The loud noise created from the grinding awakens Dracord. The 50-foot-tall beast spots you and begins to ready for attack.")
+	talking("\nYou walk down the hallway towards the snoring. It gets louder as you approach it. You stop in front of a pair of stone doors and pull the chain to open it. The loud noise created from the grinding awakens Dracord. The 50-foot-tall beast spots you and begins to ready for attack.")
 	commands()
 	
 #part12
@@ -1526,24 +1548,24 @@ def en_part12():
 	
 def ext_part12():
 	if game.player.command in ["open door", "pick lock", "pick"]:
-		print("To pick a lock, you must guess the right number.")
+		talking("To pick a lock, you must guess the right number.")
 		combo = random.triangular(000, 999)
 		number = "%03d" % int(combo)
 		while True:
 			answer = input("What's the number?\n>")
 			if answer == number:
-				print("Door unlocked.")
+				talking("Door unlocked.")
 				part13()
 			elif len(answer) != 3:
 				print("Number must be 3 digits (000 - 999).")
 			elif answer > number:
-				print("Lower...")
+				talking("Lower...", 0.02)
 			elif answer < number:
-				print("Higher...")
+				talking("Higher...", 0.02)
 			elif answer == "exit":
 				return
 			else:
-				print("NOT A NUMBER.")
+				talking("NOT A NUMBER.")
 	else:
 		show_entry_message()
 
@@ -1556,7 +1578,7 @@ def part12():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_part12
-	print("\nYou awaken in a room with a large hole in the ceiling above you. You are surrounded by rubble, but there's a locked door in front of you.\n*TING*\nA lock pick fell from the ceiling.")
+	talking("\nYou awaken in a room with a large hole in the ceiling above you. You are surrounded by rubble, but there's a locked door in front of you.\n*TING*\nA lock pick fell from the ceiling.")
 	commands()
 
 #part13
@@ -1578,7 +1600,7 @@ def part13():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_part13
-	print("\nYou walk out the door into a cave that exits to a stream. Should you follow it?")
+	talking("\nYou walk out the door into a cave that exits to a stream. Should you follow it?")
 	commands()
 
 #part14
@@ -1594,19 +1616,19 @@ def part14():
 	en_part14()
 	log_stats("13")
 	game.player.cmdext = ext_part14
-	print("\nAfter a while of following the stream, you pass some bushes. You hear rustling from them when suddenly a pack of wolves jump out.")
+	talking("\nAfter a while of following the stream, you pass some bushes. You hear rustling from them when suddenly a pack of wolves jump out.")
 	time.sleep(10)
-	print("\nYou begin to run. As you are running, you start to see a small village in the distance, but you also hear growling and barking from behind.")
+	talking("\nYou begin to run. As you are running, you start to see a small village in the distance, but you also hear growling and barking from behind.")
 	time.sleep(10)
-	print("\nYou hear a yelp from behind you but don't want to look back. You still hear angry wolves chasing you.")
+	talking("\nYou hear a yelp from behind you but don't want to look back. You still hear angry wolves chasing you.")
 	time.sleep(10)
-	print("\nYou hear another cry from a wolf. It gets a bit quiet, but you still hear a wolf chasing you.")
+	talking("\nYou hear another cry from a wolf. It gets a bit quiet, but you still hear a wolf chasing you.")
 	time.sleep(10)
-	print("\nYou hear one last thud of a wolf hitting the ground. It begins to feel calm. You slow down and look behind you. The wolves have been shot by arrows.")
+	talking("\nYou hear one last thud of a wolf hitting the ground. It begins to feel calm. You slow down and look behind you. The wolves have been shot by arrows.")
 	time.sleep(10)
-	print("\nYou walk toward the village and meet a man holding a bow.")
-	print("\n\"You alright? You were nearly mauled by those wolves back there. Good thing I was about to go hunting. Stay for a while as you take a break. If you need info, come to my house. By the way, I'm Bruce.\"")
-	print("You are now in Redwind Village")
+	talking("\nYou walk toward the village and meet a man holding a bow.")
+	talking("\n\"You alright? You were nearly mauled by those wolves back there. Good thing I was about to go hunting. Stay for a while as you take a break. If you need info, come to my house. By the way, I'm Bruce.\"")
+	talking("You are now in Redwind Village")
 	redwind()
 	
 #redwind
@@ -1686,60 +1708,60 @@ def bruce():
 	game.player.cmdext = ext_bruce
 	#print("(To leave, type "return")")
 	if game.player.areas.dracordlair == False:
-		print("\"So, you want to fight a dragon? Who sent you?\"")
+		talking("\"So, you want to fight a dragon? Who sent you?\"")
 		time.sleep(2)
-		print("\"Ruffin? I know him! You must be the chosen one! Where is he anyway?\"")
+		talking("\"Ruffin? I know him! You must be the chosen one! Where is he anyway?\"")
 		time.sleep(5)
-		print("...")
+		talking("...", 0.6)
 		time.sleep(3)
-		print("\"Oh... How sad... He was a great friend and ally...\"")
+		talking("\"Oh... How sad... He was a great friend and ally...\"")
 		time.sleep(4)
-		print("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
+		talking("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
 		time.sleep(5)
-		print("\"Oh, I forgot to mention, if you need any help, check the library.\"")
+		talking("\"Oh, I forgot to mention, if you need any help, check the library.\"")
 		time.sleep(3)
-		print("Here, take these small potions for your journey.")
+		talking("Here, take these small potions for your journey.")
 		game.player.give_item(Potion.small, 5)
 		time.sleep(2)
-		print("\"Farewell and good luck %s.\"" % (game.player.name))
+		talking("\"Farewell and good luck %s.\"" % (game.player.name))
 		time.sleep(4)
 		game.player.areas.dracordlair = True
 		game.player.areas.library = True
 		redwind()
 	elif game.player.areas.forest == False and game.player.dracordTry:
-		print("\"Hm... You tried to beat Dracord and failed? How are you alive?\"")
+		talking("\"Hm... You tried to beat Dracord and failed? How are you alive?\"")
 		time.sleep(3)
-		print("\"Ruffin's ghost? Wow.\"")
+		talking("\"Ruffin's ghost? Wow.\"", 0.04)
 		time.sleep(3)
-		print("\"Listen, I know an enchantress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.\"")
+		talking("\"Listen, I know an enchantress who can make potions. Bring her herbs, and she'll help you out. Follow the river, and you'll find her hut. You can find herbs in the forest over to the west.\"")
 		time.sleep(4)
-		print("\"There's also a mine close by. Go there to gather the materials for a sword, and I'll forge them for you. Just head north.\"")
+		talking("\"There's also a mine close by. Go there to gather the materials for a sword, and I'll forge them for you. Just head north.\"")
 		game.player.areas.forest = True
 		game.player.areas.river = True
 		game.player.areas.northmine = True
 		redwind()
 	elif game.player.metals and game.player.forged == False:
-		print("\"Great! You found all the iron we need!\"")
+		talking("\"Great! You found all the iron we need!\"")
 		game.player.take_item(Item.iron, 5)
 		time.sleep(2)
-		print("A few hours later...")
+		talking("A few hours later...")
 		time.sleep(3)
-		print("\"Here you go! It's ready for battle.\"")
+		talking("\"Here you go! It's ready for battle.\"")
 		print("You were given the Hero Sword.")
 		game.player.give_item(Weapon.hero_sword)
 		game.player.forged = True
 		redwind()
 	elif game.player.smetals and game.player.forged and game.player.sforged == False:
-		print("What's this?")
+		talking("What's this?")
 		time.sleep(2)
-		print("Ah. Drazmite! This mineral will greatly improve your sword. Let me forge this into it for you.")
+		talking("Ah. Drazmite! This mineral will greatly improve your sword. Let me forge this into it for you.")
 		game.player.take_item(Item.drazmite, 3)
 		time.sleep(5)
-		print("Here you go! Better than ever.")
+		talking("Here you go! Better than ever.")
 		game.player.give_item(Weapon.dragon_slayer)
 		game.player.sforged = True
 		if game.player.shell:
-			print("Ah, you also brought back some scorpion shell! Let me make that into armor for you.")
+			talking("Ah, you also brought back some scorpion shell! Let me make that into armor for you.")
 			time.sleep(5)
 			print("You now have Scorpio Armor!")
 			game.player.sarmor = True
@@ -1769,7 +1791,7 @@ def dracord():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_dracord
 	time.sleep(2)
-	print("You begin walking to Dracord's lair.")
+	talking("You begin walking to Dracord's lair.")
 	time.sleep(4)
 	print("(To leave, type \"return\")")
 	if game.player.dracordUnlock:
@@ -1782,30 +1804,30 @@ def dracord():
 			else:
 				print("Not \"y\" or \"n\"")
 	elif game.player.dracordUnlock == False:
-		print("There is a large door with hieroglyphs on it.")
+		talking("There is a large door with hieroglyphs on it.")
 		time.sleep(4)
 		if game.player.hasstone:
-			print("You place the Dragon Stone on the pedestal. The door starts to slowly open. As you watch the beastly Dracord sleep, you feel a negative energy.")
+			talking("You place the Dragon Stone on the pedestal. The door starts to slowly open. As you watch the beastly Dracord sleep, you feel a negative energy.")
 			game.player.dracordUnlock = True
 			time.sleep(5)
 			dracord()
 		elif game.player.transbook:
-			print("According to the translations in the book, the hieroglyphs on the door say\n\"If entry is what you seek, you must place the Dragon Stone on the Pedestal of Darkness. The Dragon Stone is stowed away and guarded at the highest point in Redwind.\"")
+			talking("According to the translations in the book, the hieroglyphs on the door say\n\"If entry is what you seek, you must place the Dragon Stone on the Pedestal of Darkness. The Dragon Stone is stowed away and guarded at the highest point in Redwind.\"")
 			if game.player.areas.mountains:
 				pass
 			else:
 				print("\nYou can now go to the Mountains.")
 				game.player.areas.mountains = True
 			time.sleep(20)
-			print("You decide to return back to the village.")
+			talking("You decide to return back to the village.")
 			time.sleep(4)
 			redwind()
 		else:
-			print("You don't understand any of the hieroglyph on the door. You return to the village.")
+			talking("You don't understand any of the hieroglyph on the door. You return to the village.")
 			time.sleep(4)
 			redwind()
 	else:
-		print("You're not ready to fight Dracord.")
+		talking("You're not ready to fight Dracord.")
 		redwind()
 
 #swamp
@@ -1844,15 +1866,15 @@ def swamp():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_swamp
 	if game.player.sshield:
-		print("As you walk towards the swamp, you hear someone yell \"STAY OUT OF MY SWAMP\" in the distance. You turn around and return to the village.")
+		talking("As you walk towards the swamp, you hear someone yell \"STAY OUT OF MY SWAMP\" in the distance. You turn around and return to the village.")
 		time.sleep(3)
 		redwind()
 	else:
-		print("You begin to follow the map to see where it takes you.")
+		talking("You begin to follow the map to see where it takes you.")
 		time.sleep(4)
-		print("On your way down the path, there is giant turtle in the way. You try to move him.")
+		talking("On your way down the path, there is giant turtle in the way. You try to move him.")
 		time.sleep(3)
-		print("It got angry and turned to you and begins to fight.")
+		talking("It got angry and turned to you and begins to fight.")
 		commands()
 
 #swamp_1
@@ -1891,9 +1913,9 @@ def swamp_1():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_swamp_1
 	time.sleep(5)
-	print("You Continue on your path to this mysterious destination.")
+	talking("You continue on your path to this mysterious destination.")
 	time.sleep(3)
-	print("A tribe of angry trolls jump ouf of the bushes and from the trees. They don't like your presence. They begin to run towards you.")
+	talking("A tribe of angry trolls jump ouf of the bushes and from the trees. They don't like your presence. They begin to run towards you.")
 	commands()
 
 '''	
@@ -1950,16 +1972,16 @@ def ext_mountains():
 		redwind()
 	elif game.player.command in ["skeleton", "examine skeleton", "examine", "check", "check skeleton", "loot", "loot skeleton", "look at skeleton", "scavenge", "scavenge skeleton"]:
 		if game.player.hasitems:
-			print("You hope to not be in the same position as this person.")
+			talking("You hope to not be in the same position as this person.")
 		else:	
-			print("You picked up some potions. One of which increased your health and made you stronger.")
+			talking("You picked up some potions. One of which increased your health and made you stronger.")
 			game.player.maxhealth += 20
 			game.player.fullheal()
 			game.player.maxstamina += 2
 			game.player.extattack += 20
 			game.player.hasitems = True
 	elif game.player.command == "climb":
-		print("You continue up Mount Amberdrift.")
+		talking("You continue up Mount Amberdrift.")
 		mountains_1()
 	else:
 		show_entry_message()
@@ -1974,16 +1996,16 @@ def mountains():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_mountains
 	if game.player.hasstone:
-		print("There is no need to go back to the mountains.")
+		talking("There is no need to go back to the mountains.")
 		redwind()
 	else:	
-		print("You begin to walk to Mount Amberdrift.")
+		talking("You begin to walk to Mount Amberdrift.")
 		time.sleep(3)
 		print("(To leave, type \"return\")")
 		time.sleep(1)
-		print("You look up a the tall mountain. Everything begins to feel big around you. You start climbing.")
+		talking("You look up a the tall mountain. Everything begins to feel big around you. You start climbing.")
 		time.sleep(20)
-		print("After some time, you made it to a spot to rest. You find the skeleton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type \"climb\").")
+		talking("After some time, you made it to a spot to rest. You find the skeleton of a person that looks to be wearing similar gear to yours. He looks to have fallen from above (to continue, type \"climb\").")
 		commands()
 
 #mountains_1
@@ -2024,9 +2046,9 @@ def mountains_1():
 	game.player.shielduse = 0
 	game.player.cmdext = ext_mountains_1
 	time.sleep(5)
-	print("You make it to the top of the mountain. The cave is just ahead. You begin to approach it.")
+	talking("You make it to the top of the mountain. The cave is just ahead. You begin to approach it.")
 	time.sleep(3)
-	print("You got to the entrance of the cave. Suddenly an armored bear; the Guardian Bear, jumps in front of you.")
+	talking("You got to the entrance of the cave. Suddenly an armored bear; the Guardian Bear, jumps in front of you.")
 	commands()
 
 #mountains_2
@@ -2047,9 +2069,9 @@ def mountains_2():
 	game.player.hasitems = False
 	game.player.cmdext = ext_mountains_2
 	time.sleep(2)
-	print("You look up to see the Dragon Stone. You gaze upon it and embrace its beauty.")
+	talking("You look up to see the Dragon Stone. You gaze upon it and embrace its beauty.")
 	time.sleep(7)
-	print("After a few moments, you regain your focus and grab the Dragon Stone. You begin to walk back to Redwind.")
+	talking("After a few moments, you regain your focus and grab the Dragon Stone. You begin to walk back to Redwind.")
 	game.player.give_item(Item.relic)
 	game.player.hasstone = True
 	time.sleep(6)
@@ -2064,10 +2086,10 @@ def ext_library():
 		redwind()
 	elif game.player.command == "ask for scrolls":
 		if (not game.player.has_item(Item.scroll)):
-			print("\"Here are some scrolls I have lying around.\"")
+			talking("\"Here are some scrolls I have lying around.\"")
 			game.player.give_item(Item.scroll, 3)
 		else:
-			print("\"You seem to have scrolls. Sorry, but I'm saving these for people who need them.\"")
+			talking("\"You seem to have scrolls. Sorry, but I'm saving these for people who need them.\"")
 	else:
 		show_entry_message()
 		
@@ -2083,19 +2105,19 @@ def library():
 	time.sleep(3)
 	print("(To leave, type \"return\")")
 	time.sleep(1)
-	print("\"Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty, just ask.\"")
+	talking("\"Welcome to the Redwind Library. I'm Adam.\nIf you need any scrolls, I've got plenty, just ask.\"")
 	if game.player.transbook == False:
 		time.sleep(3)
-		print("\"I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.\"")
+		talking("\"I heard you need to go to Dracord's Lair. You might need this translation book for the Dragon Language. Here, take it.\"")
 		game.player.transbook = True
 		game.player.give_item(Item.trans_book)
 	elif game.player.dracordTry and game.player.hasmap == False:
-		print("\"I saw you going to the mountain earlier. You seem like an adventurer. Here. Have this map I found.\"")
+		talking("\"I saw you going to the mountain earlier. You seem like an adventurer. Here. Have this map I found.\"")
 		game.player.hasmap = True
 		game.player.give_item(Item.swamp_map)
 		game.player.areas.swamp = True
 	elif game.player.strangeperm == True and game.player.strangerecipe == False:
-		print("Hey! I found this recipe when I was cleaning out an old chest. You might need it.")
+		talking("Hey! I found this recipe when I was cleaning out an old chest. You might need it.")
 		print("You were given a recipe for strange potions.")
 		game.player.strangerecipe = True
 		game.player.give_item(Item.strange_recipe)
@@ -2105,11 +2127,11 @@ def library():
 
 #forest	
 def forest():
-	print("You walk to the forest.")
+	talking("You walk to the forest.")
 	time.sleep(2)
 	confirm = input("Would you like to search the forest for herbs (y/n)?\n>")
 	if confirm == "y":
-		print("Hunting for herbs...")
+		talking("Hunting for herbs...")
 		toolbar_width = 60
 		sys.stdout.write("[%s]" % (" " * toolbar_width))
 		sys.stdout.flush()
@@ -2119,9 +2141,9 @@ def forest():
 			time.sleep(game.player.farmwait)
 			sys.stdout.write("*")
 			sys.stdout.flush()
-		print("] DONE!")
+		talking("] DONE!")
 		herbs = random.choice([8, 9, 10, 11, 12, 13, 14, 15, 16])
-		print("You found ", herbs, " herbs.")
+		talking("You found ", herbs, " herbs.")
 		game.player.give_item(Item.herb, herbs)
 		time.sleep(3)
 		redwind()
@@ -2131,11 +2153,11 @@ def forest():
 #northmine
 def northmine():
 	if not game.player.metals:
-		print("You walk to the mine.")
+		talking("You walk to the mine.")
 		time.sleep(2)
 		confirm = input("Would you like to mine for iron (y/n)?\n>")
 		if confirm == "y":
-			print("Mining...")
+			talking("Mining...")
 			toolbar_width = 60
 			sys.stdout.write("[%s]" % (" " * toolbar_width))
 			sys.stdout.flush()
@@ -2145,7 +2167,7 @@ def northmine():
 				time.sleep(game.player.minewait)
 				sys.stdout.write("*")
 				sys.stdout.flush()
-			print("] DONE!")
+			talking("] DONE!")
 			game.player.metals = True
 			game.player.give_item(Item.iron, 5)
 			time.sleep(3)
@@ -2153,7 +2175,7 @@ def northmine():
 		else:
 			redwind()
 	else:
-		print("You already have materials from this mine.")
+		talking("You already have materials from this mine.")
 		redwind()
 
 #southmine
@@ -2217,10 +2239,10 @@ def southmine():
 	game.player.healthbank = game.player.maxhealth
 	game.player.cmdext = ext_southmine
 	if game.player.smetals:
-		print("There is no need to return here.")
+		talking("There is no need to return here.")
 		redwind()
 	else:
-		print("You walk into the cave mine and see the drazmite ores. You approach them, but are interupted by a scorpion.")
+		talking("You walk into the cave mine and see the drazmite ores. You approach them, but are interupted by a scorpion.")
 		commands()
 		
 #southmine_1
@@ -2241,7 +2263,7 @@ def southmine_1():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_southmine_1
-	print("\nYou excitedly run to the drazmite ores. They seem to be loose enough to not have to mine at. You pick some up and return to the village.")
+	talking("\nYou excitedly run to the drazmite ores. They seem to be loose enough to not have to mine at. You pick some up and return to the village.")
 	time.sleep(4)
 	game.player.give_item(Item.drazmite, 3)
 	game.player.smetals = True
@@ -2276,7 +2298,7 @@ def ext_river():
 					if herbamnt() >= 3:
 						game.player.take_item(Item.herb, 3)
 						game.player.give_item(Potion.small, 1)
-						print("Small potion brewed.")
+						talking("Small potion brewed.")
 					else:
 						print("Not enough herbs.")
 				except TypeError:
@@ -2286,7 +2308,7 @@ def ext_river():
 					if herbamnt() >= 5:
 						game.player.take_item(Item.herb, 5)
 						game.player.give_item(Potion.medium, 1)
-						print("Medium potion brewed.")
+						talking("Medium potion brewed.")
 					else:
 						print("Not enough herbs.")
 				except TypeError:
@@ -2296,7 +2318,7 @@ def ext_river():
 					if herbamnt() >= 7:
 						game.player.take_item(Item.herb, 7)
 						game.player.give_item(Potion.large, 1)
-						print("Large potion brewed.")
+						talking("Large potion brewed.")
 					else:
 						print("Not enough herbs.")
 				except TypeError:
@@ -2306,7 +2328,7 @@ def ext_river():
 					if herbamnt() >= 9:
 						game.player.take_item(Item.herb, 9)
 						game.player.give_item(Potion.super, 1)
-						print("Super potion brewed.")
+						talking("Super potion brewed.")
 					else:
 						print("Not enough herbs.")
 				except TypeError:
@@ -2319,15 +2341,15 @@ def ext_river():
 							game.player.maxhealth += 35
 							game.player.maxstamina += 2
 							game.player.fullheal()
-							print("Your stamina and health increased.")
+							talking("Your stamina and health increased.")
 						else:
 							print("Not enough herbs.")
 					except TypeError:
 						print("No herbs.")
 				elif game.player.strangeperm:
-					print("You don't know that recipe.")
+					talking("You don't know that recipe.")
 				else:
-					print("\"I don't know the recipe for that yet. Maybe you can find it somewhere though.\"")
+					talking("\"I don't know the recipe for that yet. Maybe you can find it somewhere though.\"")
 					game.player.strangeperm = True
 			else:
 				print("Not a potion.")
@@ -2335,7 +2357,7 @@ def ext_river():
 		redwind()
 	elif game.player.command == "brew":
 		if (not game.player.has_item(Item.herb)):
-			print("\"You don't have any herbs. Find some in the forest.\"")
+			talking("\"You don't have any herbs. Find some in the forest.\"")
 		else:
 			brewing()
 	else:
@@ -2353,14 +2375,14 @@ def river():
 	time.sleep(3)
 	print("(To leave, type \"return\")")
 	time.sleep(1)
-	print("\"Welcome. Feel free to use my brewing stand to make potions (brew).\"")
+	talking("\"Welcome. Feel free to use my brewing stand to make potions (brew).\"")
 	if game.player.areas.southmine == False:
 		time.sleep(3)
-		print("\"What brings you here adventurer?\"")
+		talking("\"What brings you here adventurer?\"")
 		time.sleep(3)
-		print("\"Ruffin sent you? You have to make a sword?\"")
+		talking("\"Ruffin sent you? You have to make a sword?\"")
 		time.sleep(4)
-		print("\"You should probably check the south mine for some Drazmite. It will give your sword great power when forged with it.\"")
+		talking("\"You should probably check the south mine for some Drazmite. It will give your sword great power when forged with it.\"")
 		game.player.areas.southmine = True
 	else:
 		pass
@@ -2383,38 +2405,38 @@ def final_battle():
 	game.player.cmdext = ext_final_battle
 	if game.player.dracordReady:
 		time.sleep(3)
-		print("You bravely walk into Dracord's lair. You drag your sword across the floor to announce your precense. Dracord growls. It is time to battle.")
+		talking("You bravely walk into Dracord's lair. You drag your sword across the floor to announce your precense. Dracord growls. It is time to battle.")
 	else:
 		if game.player.dracordTry:
-			print("You already attempted to fight him before... You need to prepare. You return to Redwind.")
+			talking("You already attempted to fight him before... You need to prepare. You return to Redwind.")
 			redwind()
 		else:
 			time.sleep(3)
-			print("You approach Dracord. He notices you walk in and angrily breathes smoke.")
+			talking("You approach Dracord. He notices you walk in and angrily breathes smoke.")
 			time.sleep(4)
-			print("You charge at him with your sword.")
+			talking("You charge at him with your sword.")
 			time.sleep(3)
 			print("*DING*")
 			time.sleep(1)
-			print("Your sword is useless. Dracord smirks and whips you out the door with his tail. You pass out.")
+			talking("Your sword is useless. Dracord smirks and whips you out the door with his tail. You pass out.")
 			time.sleep(20)
-			print("%s!" % (game.player.name))
+			talking("%s!" % (game.player.name))
 			time.sleep(3)
-			print("%s! Wake up!" % (game.player.name))
+			talking("%s! Wake up!" % (game.player.name))
 			time.sleep(5)
-			print("You slowly open your eyes. You see a glowing orb.")
-			print("%s, it's me, Ruffin...at least the spirit of me anyway. You're not ready to fight Dracord. You need a better weapon. Talk to Bruce. He can help you." % (game.player.name))
+			talking("You slowly open your eyes. You see a glowing orb.")
+			talking("%s, it's me, Ruffin...at least the spirit of me anyway. You're not ready to fight Dracord. You need a better weapon. Talk to Bruce. He can help you." % (game.player.name))
 			game.player.dracordTry = True
 			redwind()
 	
 #end
 def end():
 	#print("")
-	print("To be continued...")
+	talking("To be continued...")
 	time.sleep(2)
 	log_stats("End")
 	show_player_stats()
-	print("The game isn't done. Don't forget to send me your log if you don't mind (More info about that in the readme file)!")
+	talking("The game isn't done. Don't forget to send me your log if you don't mind (More info about that in the readme file)!")
 	survey = input("Would you like to take a survey to help me improve my game? The survey answers will be saved in the log file. (y/n)\n>").lower()
 	if survey == "y":
 		show_survey()
@@ -2432,7 +2454,7 @@ def Save_Manager():
 		print(", ".join(map(str, os.listdir("saves"))))
 		print("\n")
 
-	print("MILDWIND SAVE MANAGER (EXPERIMENTAL)")
+	talking("MILDWIND SAVE MANAGER (EXPERIMENTAL)", 0.02)
 
 	try:
 		os.listdir("saves")
