@@ -11,6 +11,13 @@ This game is currently in a very early state, there are only a few fully (probab
 =================================================
 
 Changelog
+0.5.0.0
+-Brewing complete
+-Swamp area complete
+-New shield and weapon
+-Bug fixes
+-Typewritter effect
+
 0.4.2.0-EXPERIMENTAL
 -Brewing
 -Areas added
