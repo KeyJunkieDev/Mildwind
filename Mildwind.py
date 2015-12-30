@@ -2169,7 +2169,7 @@ def forest():
 			sys.stdout.flush()
 		talking("] DONE!")
 		herbs = random.choice([8, 9, 10, 11, 12, 13, 14, 15, 16])
-		talking("You found ", herbs, " herbs.")
+		print("You found ", herbs, " herbs.")
 		game.player.give_item(Item.herb, herbs)
 		time.sleep(3)
 		redwind()
