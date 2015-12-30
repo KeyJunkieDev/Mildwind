@@ -2,7 +2,7 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-version = "Alpha 0.4.2.0-EXPERIMENTAL"
+version = "Beta 0.5.0.0-EXPERIMENTAL"
 experimental_version = True
 
 credits = '''
@@ -121,6 +121,7 @@ class Armor(Enum):
 class Shield(Enum):
 	none				= ("None", 0, 0)
 	wooden_shield		= ("Wooden Shield", 3, 25)
+	shield_of_the_gods	= ("Shield of the Gods", 6, 5)
 
 	def name(self):
 		return self.value[0]
@@ -563,11 +564,12 @@ def talking(phrasetext, texttime=.03):
 			time.sleep(texttime)
 		sys.stdout.write(i)
 		sys.stdout.flush()
-		if i in [".", "!", "?", ":"]:
-			time.sleep(texttime*10)
-		elif i in [",", ";"]:
-			time.sleep(texttime*3)
-	time.sleep(.75)
+		if game.player.printer:
+			if i in [".", "!", "?", ":"]:
+				time.sleep(texttime*5)
+			elif i in [",", ";"]:
+				time.sleep(texttime*3)
+	time.sleep(.55)
 	print()
 	
 def talking_TEST_DO_NOT_REMOVE(phrasetext, texttime=.03):
@@ -1833,7 +1835,7 @@ def dracord():
 #swamp
 def en_swamp():
 	turtle = Enemy("Giant Turtle", 50, (5, 30), 5)
-	bear.rewards = [(Potion.medium, 1)]
+	turtle.rewards = [(Potion.medium, 1)]
 
 	turtle.deadmsg = "I like turtles."
 	turtle.killedmsg = "You attacked the giant turtle. It was hard. You have a health of {0}. You also picked up a medium potion."
@@ -1918,21 +1920,21 @@ def swamp_1():
 	talking("A tribe of angry trolls jump ouf of the bushes and from the trees. They don't like your presence. They begin to run towards you.")
 	commands()
 
-'''	
+
 #swamp_2
 def en_swamp_2():
 	chief = Enemy("Troll Chief", 300, (45, 75), 1.5)
 	chief.rewards = [(Potion.large, 2)]
 
-	chief.deadmsg = "You take the fur to use as a coat."
-	chief.killedmsg = "You killed the bear. You have a health of {0}. You also picked up a large potion or two (\"continue\")."
-	chief.damagemsg = "You attacked the bear, but he clawed you back. He has a health of {0}, and you have a health of {1}."
-	chief.deathmsg = "You were mauled to death."
+	chief.deadmsg = "It's all ogre now."
+	chief.killedmsg = "You killed the troll chief. You have a health of {0}. You also picked up a large potion or two (\"continue\")."
+	chief.damagemsg = "You attacked the chief, but he hit you back. He has a health of {0}, and you have a health of {1}."
+	chief.deathmsg = "You were beaten to death."
 
-	chief.shieldkilledmsg = "You safely deflected the bear's attacks and killed him. Your health is now {0} and you obtained two large potions (\"continue\")."
-	chief.shieldmsg = "You deflected the bear's attack and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
+	chief.shieldkilledmsg = "You safely deflected the chief's attacks and killed him. Your health is now {0} and you obtained two large potions (\"continue\")."
+	chief.shieldmsg = "You dodged the chief's club and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
 
-	chief.rundamagemsg = "The bear clawed you. Your health is now {1}. You can't leave until he's dead."
+	chief.rundamagemsg = "The chief punched you. Your health is now {1}. You can't leave until he's dead."
 
 	game.set_current_enemy(chief)
 	
@@ -1948,20 +1950,44 @@ def ext_swamp_2():
 		show_entry_message()
 	
 def swamp_2():
-	game.player.savepos = mountains_1
-	save()
-	en_mountains_1()
-	log_stats("mountains")
-	game.player.randhint = ["Hints tend to be useless."]
+	en_swamp_2()
+	log_stats("swamp_1")
+	game.player.randhint = ["Why do you need hints?"]
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
-	game.player.cmdext = ext_mountains_1
+	game.player.cmdext = ext_swamp_2
 	time.sleep(5)
-	print("You make it to the top of the mountain. The cave is just ahead. You begin to approach it.")
+	talking("Just ahead is a shrine with the sunrays peeking through the ceiling shining on a shield.")
 	time.sleep(3)
-	print("You got to the entrance of the cave. Suddenly an armored bear; the Guardian Bear, jumps in front of you.")
+	talking("You are stopped by the troll chief. \"YOU KILLED MY PEOPLE! NOW I WILL KILL YOU!\".")
 	commands()
-'''
+
+#swamp_3
+def swamp_3():
+	game.set_current_enemy(no_enemy)
+		
+def ext_swamp_3():
+	show_entry_message()
+		
+def swamp_3():
+	game.player.savepos = swamp_3
+	save()
+	en_swamp_3()
+	log_stats("swamp_2")
+	game.player.randhint = ["Hints are useless."]
+	game.player.stamina = game.player.maxstamina
+	game.player.shielduse = 0
+	game.player.hasitems = False
+	game.player.cmdext = ext_swamp_3
+	time.sleep(2)
+	talking("You slowly walk towards the shield.")
+	time.sleep(7)
+	talking("Under the pedestal reads \"Shield of the Gods\". You pick it up and feel its power.")
+	game.player.give_item(Shield.shield_of_the_gods)
+	game.player.sshield = True
+	talking("You return to the village.")
+	time.sleep(6)
+	redwind()
 		
 #mountains
 def en_mountains():
