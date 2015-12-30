@@ -1,16 +1,23 @@
+==================== Mildwind ====================
+
+==================================================
+
 Instructions
 
 Run the game.
+
+==================================================
 
 Old save files will not work with this version
 
 If you could, please send me your log using Pastebin once you've completed the game: http://pastebin.com/
 
-This game is currently in a very early state, there are only a few fully (probably) complete section of the story. Be sure to test every command and possible combination I can throw at you to try to break the game. I will attempt to fix any bug or crash you find.
+Be sure to test every command and possible combination I can throw at you to try to break the game. I will attempt to fix any bug or crash you find.
 
-=================================================
+==================================================
 
 Changelog
+
 0.5.0.0
 -Brewing complete
 -Swamp area complete
