@@ -1917,7 +1917,7 @@ def swamp_1():
 	time.sleep(5)
 	talking("You continue on your path to this mysterious destination.")
 	time.sleep(3)
-	talking("A tribe of angry trolls jump ouf of the bushes and from the trees. They don't like your presence. They begin to run towards you.")
+	talking("A tribe of angry trolls jump out of the bushes and from the trees. They don't like your presence. They begin to run towards you.")
 	commands()
 
 
@@ -1945,7 +1945,7 @@ def ext_swamp_2():
 		game.player.attack_enemy(game.current_enemy)
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [0, 25, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 75, 75, 75, 75, 75, 75, 75, 75, 100]):
-			mountains_2()
+			swamp_3()
 	else:
 		show_entry_message()
 	
@@ -1963,15 +1963,13 @@ def swamp_2():
 	commands()
 
 #swamp_3
-def swamp_3():
+def en_swamp_3():
 	game.set_current_enemy(no_enemy)
 		
 def ext_swamp_3():
 	show_entry_message()
 		
 def swamp_3():
-	game.player.savepos = swamp_3
-	save()
 	en_swamp_3()
 	log_stats("swamp_2")
 	game.player.randhint = ["Hints are useless."]
