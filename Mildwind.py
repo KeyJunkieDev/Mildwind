@@ -213,6 +213,7 @@ class Player():
 	def __init__(self, name):
 		self.name			= name
 		self.command		= ""
+		self.printer		= True
 		self.version		= version
 		self.inventory		= Inventory()
 
@@ -313,10 +314,10 @@ class Player():
 	def use_shield(self, enemy):
 		if game.player.shield is not Shield.none:
 			if enemy.dead:
-				print(enemy.deadmsg)
+				talking(enemy.deadmsg, .02)
 			else:
 				if self.stamina <= 0:
-					print("You don't have enough stamina.")
+					talking("You don't have enough stamina.", .02)
 				else:
 					if game.player.shielduse >= 2:
 						damage = enemy.random_attack()
@@ -332,11 +333,11 @@ class Player():
 							self.heal(10)
 							if enemy.dead:
 								self.give_items(game.current_enemy.rewards)
-								print(enemy.shieldkilledmsg.format(self.gethealth()))
+								talking(enemy.shieldkilledmsg.format(self.gethealth()), .02)
 							else:
 								print(enemy.shieldmsg.format(enemy.health, self.gethealth()))
 		else:
-			print("You don't have a shield.")
+			talking("You don't have a shield.", .02)
 
 	def run_from_enemy(self, enemy, damage=[0, 5]):
 		ran = False
@@ -352,7 +353,7 @@ class Player():
 				print(enemy.runmsg)
 				ran = True
 		else:
-			print("You continue your journey to defeat Dracord.")
+			talking("You continue your journey to defeat Dracord.", .04)
 			ran = True
 		return ran
 
@@ -538,6 +539,8 @@ def commands():
 			show_random_quote()
 		#elif game.player.command == "achievement":
 			#show_achievement()
+		elif game.player.command == "printing":
+			printingtoggle()
 		elif game.player.command == "credits":
 			show_credits()
 		elif game.player.command == "cheats":
@@ -547,6 +550,21 @@ def commands():
 		else:
 			game.player.cmdext()
 
+def printingtoggle():
+	game.player.printer = not game.player.printer
+	if game.player.printer:
+		talking("Printing is on.", .04)
+	else:
+		print("Printing is off.")
+			
+def talking(phrasetext, texttime):
+	for i in str(phrasetext):
+		if game.player.printer:
+			time.sleep(texttime)
+		sys.stdout.write(i)
+		sys.stdout.flush()
+	print()
+			
 def show_credits():
 	print(credits)
 
@@ -556,20 +574,20 @@ def get_time_played():
 def use_hint():
 	if game.player.has_item(Item.scroll):
 		game.player.take_item(Item.scroll)
-		print(random.choice(game.player.randhint))
+		talking(random.choice(game.player.randhint), .02)
 		print("You have %s scroll(s) left." % (game.player.get_item_amount(Item.scroll)))
 	else:
-		print("You don't have any scrolls to use.")
+		talking("You don't have any scrolls to use.", .03)
 
 def list_potion_types():
 	print("Potion Commands:\nSmall Potion:\n spot\n smallpot\n smallpotion\n small potion\nMedium Potions:\n mpot\n medpot\n mediumpot\n medpotion\n mediumpotion\n medium potion\nLarge Potions:\n lpot\n lrgpot\n largepot\n lrgpotion\n largepotion\n large potion\nSuper Potions:\n sppot\n suppot\n superpot\n suppotion\n superpotion\n super potion\n")
 
 def use_potion(type):
 	if (not game.player.has_item(type)):
-		print("You don't have any of that type of potion to use.")
+		talking("You don't have any of that type of potion to use.", .01)
 		return
 	if game.player.gethealth() >= game.player.maxhealth:
-		print("You already have max health.")
+		talking("You already have max health.", .01)
 	else:
 		if type.healing() == "max":
 			game.player.fullheal()
@@ -802,7 +820,7 @@ def change_name():
 		check = input("Are you sure? (y/n)\n>").lower()
 		if check == "y":
 			game.player.name = newname
-			print("Your name is now %s" % (game.player.name))
+			talking("Your name is now %s" % (game.player.name), .03)
 			break
 		else:
 			print("Name left unchanged")
@@ -910,34 +928,34 @@ def log_stats(part):
 	
 #tutorial
 def tutorial():
-	print("Welcome to Mildwind! In this tutorial, I will guide you on how the basics of how the game works.")
+	talking("Welcome to Mildwind! In this tutorial, I will guide you on how the basics of how the game works.", .04)
 	while True:
 		tuthint = input("Firstly, let's show you what to do when you're stuck. When you don't know what to do, just type \"hint\". Using the hint command will subtract one hint from your stats. In the game, hints are also known as scrolls. You can find them throughout Mildwind. Use \"hint\" now.\n>").lower()
 		if tuthint == "hint":
-			print("Great! You just used a hint (This hint use will not count against you in the actual game).")
+			talking("Great! You just used a hint (This hint use will not count against you in the actual game).", .03)
 			print("You have 2 hint(s) left.")
 			break
 		else:
-			print("That's not how you use hints. Try again (Type \"hint\").")
+			talking("That's not how you use hints. Try again (Type \"hint\").", .04)
 	while True:
 		tutpotion = input("You look a little hurt, drink a potion. To drink a potion, just type \"potion\". Potions can be found often and will be critical to your survival later on in Mildwind. Use \"potion\" now.\n>").lower()
 		if tutpotion == "potion":
 			print("Potion used. Your health is now maxed.")
 			break
 		else:
-			print("That's not how you use potions. Try again (Type \"potion\").")
+			talking("That's not how you use potions. Try again (Type \"potion\").", .04)
 	while True:
 		tutattack = input("LOOK OUT! There's a wolf coming right at you! To attack enemies, type \"attack\".\n>").lower()
 		if tutattack == "attack":
 			print("You defeated the wolf.")
 			break
 		else:
-			print("That's not how you use attacks. Try again (Type \"attack\").")
+			talking("That's not how you use attacks. Try again (Type \"attack\").", .04)
 	while True:
 		tutgeneral = input("Sometimes the game won't tell you what to do, for instance: \"There is a door in front of you.\" What do you think you have to do here?\n>").lower()
 		if tutgeneral in ["door", "open door"]:
-			print("You opened the door and went into the next room.")
-			print("Good! When playing Mildwind, be sure to read carefully. You may need to do certain actions to get things you may need. In some instances, you won't even be able to progress without trying to figure out what to do on your own. If you ever get stuck, remember to use \"hint\", but also know that hints are limited.")
+			talking("You opened the door and went into the next room.", .05)
+			talking("Good! When playing Mildwind, be sure to read carefully. You may need to do certain actions to get things you may need. In some instances, you won't even be able to progress without trying to figure out what to do on your own. If you ever get stuck, remember to use \"hint\", but also know that hints are limited.", .05)
 			break
 		else:
 			print("Try \"open door\".")
@@ -964,12 +982,12 @@ def en_part1():
 
 def ext_part1():
 	if game.player.command in ["look at window", "look out window", "window"]:
-		print("You sigh and gaze out the window.")
+		talking("You sigh and gaze out the window.", .04)
 	elif game.player.command in ["look at guard", "analyse guard", "guard"]:
 		if game.player.stolen:
-			print("You snicker a little as you notice the guard's empty pocket.")
+			talking("You snicker a little as you notice the guard's empty pocket.", .02)
 		else:
-			print("You notice the guard has something in his pocket. As he walks, it seems to be within your reach.")
+			talking("You notice the guard has something in his pocket. As he walks, it seems to be within your reach.", .02)
 	elif game.player.command in ["bash head into wall", "bang head into wall", "bang head against wall", "bash head against wall"]:
 		damage = 5
 		damagemsg = "You bashed your head into the wall out of misery. It hurts a little. You lost %s health."
@@ -978,27 +996,27 @@ def ext_part1():
 		game.player.headbanger = True
 		game.player.hurt(damage, False, damagemsg % (damage), deathmsg, ending)
 	elif game.player.command in ["attack", "fight", "a"]:
-		print("You can't attack behind bars.")
+		talking("You can't attack behind bars.", .02)
 	elif game.player.command == "talk to prisoner":
 		if game.player.hasitems:
-			print("I have nothing else to say...")
+			talking("I have nothing else to say...", .04)
 		else:
 			game.player.hasitems = True
 			game.player.give_item(Potion.small, 2)
 			game.player.maxhealth += 5
-			print("\"Greetings %s, today is my last day alive... I must face my death sentence... Take these. They won't be of use to me in my afterlife.\"" % (game.player.name))
+			talking("\"Greetings %s, today is my last day alive... I must face my death sentence... Take these. They won't be of use to me in my afterlife.\"" % (game.player.name), .05)
 			if game.player.stolen:
-				print("\"Heh, I saw what you did back there.\"")
+				talking("\"Heh, I saw what you did back there.\"", .03)
 				game.player.maxhealth = game.player.maxhealth + 5
 			if game.player.headbanger:
-				print("\"I see that your head is bleeding...take this bandage.\" Your health is now restored to max.")
+				talking("\"I see that your head is bleeding...take this bandage.\" Your health is now restored to max.", .03)
 				game.player.fullheal()
-			print("You were given 2 small potions and a mysterious one. The prisoner recommended that you drink the mysterious one, so you did. Your max health increased a little.")
+			talking("You were given 2 small potions and a mysterious one. The prisoner recommended that you drink the mysterious one, so you did. Your max health increased a little.", .04)
 	elif game.player.command == "wait":
 		if game.player.stolen:
-			print("You wait. Nothing happened.")
+			talking("You wait. Nothing happened.", .02)
 		else:
-			print("You hear a noise coming from the window, when suddenly, the wall breaks down. A man with a wooden metal-plated battering ram bashes the wall down. \"%s, We need your help, only you are capable of killing the dragon. No time to explain right now. Take these items.\"\nYou have been given a steel sword, cheap armor, and a scroll." % (game.player.name))
+			talking("You hear a noise coming from the window, when suddenly, the wall breaks down. A man with a wooden metal-plated battering ram bashes the wall down. \"%s, We need your help, only you are capable of killing the dragon. No time to explain right now. Take these items.\"\nYou have been given a steel sword, cheap armor, and a scroll." % (game.player.name), .04)
 			game.player.give_item(Item.scroll)
 			game.player.give_item(Weapon.steel_sword)
 			game.player.give_item(Armor.leather_armor)
@@ -1012,7 +1030,7 @@ def ext_part1():
 			if game.player.hints > 0:
 				game.player.hints = game.player.hints - 1
 		else:	
-			print("As the guard passes by, you reach in his pocket and grabbed some items. You found a dagger, scroll, and key.")
+			talking("As the guard passes by, you reach in his pocket and grabbed some items. You found a dagger, scroll, and key.", .03)
 			game.player.give_item(Item.scroll)
 			game.player.give_item(Weapon.dagger)
 			game.player.give_item(Item.prison_key)
@@ -1031,7 +1049,7 @@ def part1():
 	save()
 	game.player.cmdext = ext_part1
 	game.player.randhint = ["Maybe the guard has something of use?", "Wait for something to happen?", "Maybe the prisoner has something to say?", "The door can be unlocked.", "I guess all you can do is bash your head against the wall."]
-	print("\nYou awaken in a dungeon. Behind you is a tiny barred window, and in front of you is a locked, barred door. There is a prisoner in the cell across from you and a guard that marches back and forth in the halls.")
+	talking("\nYou awaken in a dungeon. Behind you is a tiny barred window, and in front of you is a locked, barred door. There is a prisoner in the cell across from you and a guard that marches back and forth in the halls.", .03)
 	game.player.ruffindead = False
 	commands()
 
@@ -1427,7 +1445,7 @@ def ext_part10():
 	if game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		print("You bravely walk into Dracord's lair.")
 		part11()
-	elif game.player.command in ["vase", "look in vase", "look in the vase"]:
+	elif game.player.command in ["vase", "look in vase", "look in the vase", "loot", "loot vase"]:
 		if game.player.hasitems:
 			print("You look at the empty vase.")
 		else:
