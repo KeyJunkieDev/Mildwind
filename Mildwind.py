@@ -38,7 +38,9 @@ logging.debug("If you are experiencing issues, or feel like some commands should
 -Decrease lines of code used (If possible)
 -Tweak difficulty and chance of death
 -Finish help (again)
--Achievements?
+-Edit tutorial
+-Achievements
+-Fix how potions are listed in inventory
 '''
 
 #intro
