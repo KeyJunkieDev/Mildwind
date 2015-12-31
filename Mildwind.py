@@ -183,21 +183,19 @@ class Unlocked_areas():
 		self.river				= False
 		self.library			= False
 
-'''
 class Achievements():
 	def __init__(self):
-		#ID				= ["achievement", "description"]
-		headbanger		= ["Headbanger", "Bash your head into the wall"]
-		encounter		= ["The Encounter", "Meet Ruffin"]
-		suicide			= ["Suicide", "Kill yourself (the doppleghanger)"]
-		farmer			= ["Farmer", "Gather herbs in the forest"]
-		bitten			= ["THIS BITES!", "Get bitten by a wolf"]
-		scorpio			= ["Scorpio", "Get Scorpio armor"]
-		godly			= ["Godly", "Get the Shield of the Gods"]
-		stranger		= ["Stranger", "Make a strange potion"]
-		battleready		= ["Battleready", "Be prepared to fight Dracord"]
-		slayer			= ["Slayer", "Create the Dragon Slayer sword"]
-'''
+		#ID				= ["achievement",		"description"]
+		headbanger		= ["Headbanger",		"Bash your head into the wall"]
+		encounter		= ["The Encounter",		"Meet Ruffin"]
+		suicide			= ["Suicide",			"Kill yourself (the doppleghanger)"]
+		farmer			= ["Farmer",			"Gather herbs in the forest"]
+		bitten			= ["THIS BITES!",		"Get bitten by a wolf"]
+		scorpio			= ["Scorpio",			"Get Scorpio armor"]
+		godly			= ["Godly",				"Get the Shield of the Gods"]
+		stranger		= ["Stranger",			"Make a strange potion"]
+		battleready		= ["Battleready",		"Be prepared to fight Dracord"]
+		slayer			= ["Slayer",			"Create the Dragon Slayer sword"]
 		
 class Player():
 	def __init__(self, name):
