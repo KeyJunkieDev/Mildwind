@@ -17,6 +17,9 @@ Be sure to test every command and possible combination I can throw at you to try
 ==================================================
 
 Changelog
+0.7.0.0
+-Story complete
+-Bug fixes
 
 0.5.0.0
 -Brewing complete
@@ -25,7 +28,7 @@ Changelog
 -Bug fixes
 -Typewritter effect
 
-0.4.2.0-EXPERIMENTAL
+0.4.2.0
 -Brewing
 -Areas added
 -Bug fixes

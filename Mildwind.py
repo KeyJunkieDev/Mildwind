@@ -2,7 +2,7 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-version = "Beta 0.5.0.0-EXPERIMENTAL"
+version = "Beta 0.7.0.0-EXPERIMENTAL"
 experimental_version = True
 
 credits = '''
@@ -35,11 +35,9 @@ logging.debug("If you are experiencing issues, or feel like some commands should
 
 #todo
 '''
--Finish game (duh)
 -Decrease lines of code used (If possible)
--increase difficulty and chance of death
+-Tweak difficulty and chance of death
 -Finish help (again)
--Randomized loot?
 -Achievements?
 '''
 
@@ -175,30 +173,13 @@ class Inventory():
 class Unlocked_areas():
 	def __init__(self):
 		self.dracordlair		= False
-		#[DONE] Visit the first time to discover where the key is. No understanding of words without book.
-		#[DONE] Fail to fight Dracord. Revived by Ruffin's ghost at Redwind. Visit Bruce.
-		#Fight with new sword, win.
 		self.forest				= False
-		#[DONE] Gain access by talking to Bruce. Collect materials for potions. Player can theoretically come here as much as he/she wants, but it takes forever.
-		#[DONE] Make player wait 30 minutes. Get random amount of herbs.
 		self.swamp				= False
-		#[DONE] Library gives you map to swamp.
-		#Fight Giant Turtle and trolls, boss fight with chief. Get shield. Use special potion.
 		self.mountains			= False
-		#[DONE] Fight bear. Grab key.
 		self.northmine			= False
-		#[DONE] Visit to gather materials to make a powerful sword.
-		#[DONE] Go to Bruce. 
 		self.southmine			= False
-		#[DONE] Come here for special ore. Fight scorpion.
-		#[DONE] Bruce can turn scorpion shell into armor.
-		#[DONE] Scorpion blood can be drank as special potion.
 		self.river				= False
-		#[DONE] Bruce refers you to Dazzle. Enchant sword. Get directed other mine. Gives special potion.
-		#[DONE] Player can come here to brew potions.
 		self.library			= False
-		#[DONE] Go here for translation book.
-		#[DONE] Also get scroll if 0.
 
 '''
 class Achievements():
@@ -208,6 +189,12 @@ class Achievements():
 		encounter		= ["The Encounter", "Meet Ruffin"]
 		suicide			= ["Suicide", "Kill yourself (the doppleghanger)"]
 		farmer			= ["Farmer", "Gather herbs in the forest"]
+		bitten			= ["THIS BITES!", "Get bitten by a wolf"]
+		scorpio			= ["Scorpio", "Get Scorpio armor"]
+		godly			= ["Godly", "Get the Shield of the Gods"]
+		stranger		= ["Stranger", "Make a strange potion"]
+		battleready		= ["Battleready", "Be prepared to fight Dracord"]
+		slayer			= ["Slayer", "Create the Dragon Slayer sword"]
 '''
 		
 class Player():
@@ -522,8 +509,6 @@ def commands():
 			show_player_stats()
 		elif game.player.command == "enstats":
 			show_enemy_stats()
-		#elif game.player.command == "inventory":
-			#show_inventory()
 		elif game.player.command == "help":
 			show_help()
 		elif game.player.command == "newname":
@@ -1495,7 +1480,7 @@ def part10():
 
 #part11	
 def en_part11():
-	dracord = Enemy("Dracord", 5000, (35, 45), 10)
+	dracord = Enemy("Dracord", 2500, (85, 100), 5)
 	game.set_current_enemy(dracord)
 
 def ext_part11():
@@ -1687,7 +1672,6 @@ def redwind():
 	available_areas(game.player.areas.river, "-River")
 	available_areas(game.player.areas.library, "-Library")
 	commands()
-	#list of places to go to. I plan to have areas that unlock as you progress.
 
 #bruce	
 def en_bruce():
@@ -1708,7 +1692,6 @@ def bruce():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_bruce
-	#print("(To leave, type "return")")
 	if game.player.areas.dracordlair == False:
 		talking("\"So, you want to fight a dragon? Who sent you?\"")
 		time.sleep(2)
@@ -1768,6 +1751,12 @@ def bruce():
 			print("You now have Scorpio Armor!")
 			game.player.sarmor = True
 			game.player.give_item(Armor.scorpio_armor)
+		redwind()
+	elif (game.player.sshield and game.player.forged) and game.player.dracordReady == False:
+		talking("\"Ah, are you ready to defeat Dracord?\"")
+		time.sleep(1)
+		talking("\"Great! Go after him!\"")
+		game.player.dracordReady = True
 		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
@@ -2209,11 +2198,11 @@ def en_southmine():
 
 	scorpion.deadmsg = "You stare at the dead scorpion and watch it twitch."
 	scorpion.killedmsg = "You attacked the scorpion. He has been killed, and you have a health of {0}. You also picked up a few super potions.\nYou notice that the scorpion shell looks kinda sturdy. The blood looks -strange-."
-	scorpion.damagemsg = "You attacked the scorpion, but he poisoned you a bit. She has a health of {0}, and you have a health of {1}."
+	scorpion.damagemsg = "You attacked the scorpion, but he poisoned you a bit. He has a health of {0}, and you have a health of {1}."
 	scorpion.deathmsg = "You were killed."
 
 	scorpion.shieldkilledmsg = "You safely deflected the scorpion's attacks and killed him. Your health is now {0} and you obtained 2 super potions.\nYou notice that the scorpion shell looks kinda sturdy. The blood looks -strange-."
-	scorpion.shieldmsg = "You deflected the scorpion's attack and he hurt himself in the process. You used some of your stamina in the process. Her health is {0} and yours is {1}."
+	scorpion.shieldmsg = "You deflected the scorpion's attack and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
 
 	scorpion.rundamagemsg = "The scorpion clawed you. Your health is now {1}. You can't leave until he's dead."
 
@@ -2413,23 +2402,44 @@ def river():
 	commands()
 		
 def en_final_battle():
-	game.set_current_enemy(no_enemy)
+	dracord = Enemy("Dracord", 2500, (85, 105), 5)
+	dracord.rewards = [(Potion.super, 50)]
+
+	dracord.deadmsg = "You look deeply into the dead eyes of Dracord. You feel a feeling of satisfaction knowing you've killed him."
+	dracord.killedmsg = "You've just about had it with Dracord. You take your sword and stab him right in the neck after his scales have been weakened."
+	dracord.damagemsg = "You fiercly stab Dracord. He blows fire back. He has a health of {0}, and you have a health of {1}."
+	dracord.deathmsg = "Dracord whiped you angrily into the sharp-edged stone wall. Your body sloped down the wall. You were defeated."
+
+	dracord.shieldkilledmsg = "You safely dodge Dracord's tail-whip and stabbed him fiercely in his weakened neck."
+	dracord.shieldmsg = "You dodged Dracord's tail-whip and he hurt himself in the process. You used some of your stamina in the process. His health is {0} and yours is {1}."
+
+	dracord.rundamagemsg = "Dracord whips you into the wall with his tail when you attempted to run. Your health is now {1}. You can't leave until he's dead."
+	game.set_current_enemy(dracord)
 	
 def ext_final_battle():
-	show_entry_message()
+	if game.player.command == "shield":
+		game.player.use_shield(game.current_enemy)
+	elif game.player.command in ["attack", "fight", "a"]:
+		game.player.attack_enemy(game.current_enemy)
+	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
+		if game.player.run_from_enemy(game.current_enemy, [100, 200, 300]):
+			end()
+	else:
+		show_entry_message()
 	
 def final_battle():
 	game.player.savepos = final_battle
 	save()
 	en_final_battle()
 	log_stats("dracord")
-	game.player.randhint = ["Hints tend to be useless."]
+	game.player.randhint = ["Lol."]
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_final_battle
 	if game.player.dracordReady:
 		time.sleep(3)
 		talking("You bravely walk into Dracord's lair. You drag your sword across the floor to announce your precense. Dracord growls. It is time to battle.")
+		commands()
 	else:
 		if game.player.dracordTry:
 			talking("You already attempted to fight him before... You need to prepare. You return to Redwind.")
@@ -2455,12 +2465,16 @@ def final_battle():
 	
 #end
 def end():
-	#print("")
-	talking("To be continued...")
-	time.sleep(2)
+	time.sleep(1)
 	log_stats("End")
 	show_player_stats()
-	talking("The game isn't done. Don't forget to send me your log if you don't mind (More info about that in the readme file)!")
+	talking("This is it. This is the end of the line... You beat Dracord and saved the world. From what, you don't know. You walk back to Redwind to share the news, but it seems everyone already knows.", .05)
+	talking("Bruce runs to you. \"%s! You did it! You defeated Dracord!\"" % (game.player.name), .04)
+	talking("\"Why was Dracord a threat? Dracord was defeated years ago. He was burning villages and eating citizens. The sky turned blood-red. He was defeated by Maxwell Mileway. Maxwell was the only person able to kill him because he had Dragon Blood in his veins. You are part of the Mileway family, and when we heard he was back, we needed to find you. Ruffin was friends with your parents. Too bad they won't be able to see what you've done for us...\"", .05)
+	talking("\"Anywho, let us celebrate your victory!\"")
+	talking(".....")
+	show_credits()
+	talking("....................", .1)
 	survey = input("Would you like to take a survey to help me improve my game? The survey answers will be saved in the log file. (y/n)\n>").lower()
 	if survey == "y":
 		show_survey()
@@ -2470,7 +2484,7 @@ def end():
 		input("Thank you for playing my game!")
 		sys.exit()
 
-#************************************************************start************************************************************
+#************************************************************ start ************************************************************
 		
 def Save_Manager():
 	def printsaves():
@@ -2541,7 +2555,6 @@ def tutorial_input():
 	else:
 		part1()
 
-#possibly subject to being a function
 def start():
 	choose_name()
 	try:
