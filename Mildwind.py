@@ -1480,7 +1480,7 @@ def part10():
 
 #part11	
 def en_part11():
-	dracord = Enemy("Dracord", 2500, (85, 100), 5)
+	dracord = Enemy("Dracord", 1000, (85, 100), 5)
 	game.set_current_enemy(dracord)
 
 def ext_part11():
@@ -2402,7 +2402,7 @@ def river():
 	commands()
 		
 def en_final_battle():
-	dracord = Enemy("Dracord", 2500, (85, 105), 5)
+	dracord = Enemy("Dracord", 1000, (85, 105), 5)
 	dracord.rewards = [(Potion.super, 50)]
 
 	dracord.deadmsg = "You look deeply into the dead eyes of Dracord. You feel a feeling of satisfaction knowing you've killed him."
