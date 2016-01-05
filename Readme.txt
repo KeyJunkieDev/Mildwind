@@ -8,7 +8,17 @@ Run the game.
 
 ==================================================
 
-Old save files will not work with this version
+Option commands
+
+printing - toggles the text printing effect (default: on)
+
+printingspeed - changes the speed of the text printing effect (default: 1)
+
+achievementmessages - toggles "achievement earned" message when you get an achievement (default: on)
+
+==================================================
+
+Save files from before Beta 0.9.0.0 are incompatible with the current version
 
 If you could, please send me your log using Pastebin once you've completed the game: http://pastebin.com/
 
@@ -17,6 +27,16 @@ Be sure to test every command and possible combination I can throw at you to try
 ==================================================
 
 Changelog
+0.9.0.0
+-Added achievements
+-Added "achievementmessages" command (toggles "achievement earned" messages)
+-Added "printingspeed" command (changes the text printing speed)
+-Potions and scrolls are now shown first in the inventory
+-Updated potion tutorial
+-Updated help menu
+-Changed text printing speed for some messages
+-Fixed text printing effect pausing at punctuation at the end of messages
+
 0.7.0.0
 -Story complete
 -Bug fixes

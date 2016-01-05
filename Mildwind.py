@@ -2,7 +2,7 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-version = "Beta 0.7.0.0-EXPERIMENTAL"
+version = "Beta 0.9.0.0-EXPERIMENTAL"
 experimental_version = True
 
 credits = '''
@@ -181,19 +181,23 @@ class Unlocked_areas():
 		self.river				= False
 		self.library			= False
 
-class Achievements():
-	def __init__(self):
-		#ID				= ["achievement",		"description"]
-		headbanger		= ["Headbanger",		"Bash your head into the wall"]
-		encounter		= ["The Encounter",		"Meet Ruffin"]
-		suicide			= ["Suicide",			"Kill yourself (the doppleghanger)"]
-		farmer			= ["Farmer",			"Gather herbs in the forest"]
-		bitten			= ["THIS BITES!",		"Get bitten by a wolf"]
-		scorpio			= ["Scorpio",			"Get Scorpio armor"]
-		godly			= ["Godly",				"Get the Shield of the Gods"]
-		stranger		= ["Stranger",			"Make a strange potion"]
-		battleready		= ["Battleready",		"Be prepared to fight Dracord"]
-		slayer			= ["Slayer",			"Create the Dragon Slayer sword"]
+class Achievement(Enum):
+	headbanger		= ("Headbanger",		"Bash your head into a wall")
+	encounter		= ("The Encounter",		"Meet Ruffin")
+	suicide			= ("Suicide",			"Kill yourself (the doppelganger)")
+	farmer			= ("Farmer",			"Gather herbs in the forest")
+	bitten			= ("THIS BITES!",		"Get bitten by a wolf")
+	scorpio			= ("Scorpio",			"Get Scorpio armor")
+	godly			= ("Godly",				"Get the Shield of the Gods")
+	stranger		= ("Stranger",			"Make a strange potion")
+	battleready		= ("Battleready",		"Be prepared to fight Dracord")
+	slayer			= ("Slayer",			"Create the Dragon Slayer sword")
+
+	def name(self):
+		return self.value[0]
+
+	def requirement(self):
+		return self.value[1]
 		
 class Player():
 	def __init__(self, name):
@@ -203,6 +207,9 @@ class Player():
 		self.printer_speed  = 1
 		self.version		= version
 		self.inventory		= Inventory()
+		self.achievements   = []
+		self.achievehelp    = False
+		self.showachievemsg = True
 
 		self.weapon			= Weapon.fists
 		self.armor			= Armor.prison_clothes
@@ -267,7 +274,7 @@ class Player():
 			self.health = 0
 			show_end_message(deathmsg, ending, "lose")
 		else:
-			print(damagemsg.format("", self.gethealth()))
+			talking(damagemsg.format("", self.gethealth()), 0.01)
 
 	def heal(self, amount):
 		self.sethealth(self.health + amount)
@@ -388,6 +395,16 @@ class Player():
 			if invitem.amount < 1:
 				self.inventory.items.remove(self.getitem(item))
 
+	def give_achievement(self, achievement):
+		if achievement in self.achievements:
+			return
+		self.achievements.append(achievement)
+		if self.showachievemsg:
+			print("Achievement earned: %s" % (achievement.name()))
+		if self.achievehelp == False:
+			self.achievehelp = True
+			print("To view your achievements, type \"achievements\". To disable achievement messages, type \"achievementmessages\".")
+
 class Enemy():
 	def __init__(self, name="Enemy", health=100, attack=(5, 20), armor=1):
 		self.name				= name
@@ -506,6 +523,10 @@ def commands():
 			use_potion(Potion.super)
 		elif game.player.command == "stats":
 			show_player_stats()
+		elif game.player.command == "achievements":
+			show_achievements()
+		elif game.player.command == "achievementmessages":
+			toggle_achievement_messages()
 		elif game.player.command == "enstats":
 			show_enemy_stats()
 		elif game.player.command == "help":
@@ -522,8 +543,6 @@ def commands():
 			quit()
 		elif game.player.command == "quote":
 			show_random_quote()
-		#elif game.player.command == "achievement":
-			#show_achievement()
 		elif game.player.command == "printing":
 			toggle_printing()
 		elif game.player.command == "printingspeed":
@@ -685,6 +704,22 @@ def show_player_stats():
 		print("CHEATED")
 	else:
 		pass
+
+def show_achievements():
+	print()
+	print("=< ACHIEVEMENTS >=")
+	if len(game.player.achievements) == 0:
+		print("You have not earned any achievements yet.")
+	else:
+		for achievement in game.player.achievements:
+			print("%s - %s" % (achievement.name(), achievement.requirement()))
+
+def toggle_achievement_messages():
+	game.player.showachievemsg = not game.player.showachievemsg
+	if game.player.showachievemsg:
+		talking("Achievement messages are on.", .04)
+	else:
+		talking("Achievement messages are off.", .04)
 
 def show_enemy_stats():
 	enemy = game.current_enemy
@@ -901,9 +936,9 @@ def show_survey():
 
 def show_end_message(deathmsg, ending, winlose):
 	if deathmsg is not "":
-		print(deathmsg)
+		talking(deathmsg)
 	if ending is not "":
-		print("\"%s\" ending" % (ending))
+		talking("\"%s\" ending" % (ending))
 	show_player_stats()
 	if winlose == "win":
 		win()
@@ -1024,7 +1059,7 @@ def tutorial():
 		else:
 			print("That's not how you use stats. Try again (type \"stats\").")
 	input("Good! You've learned the basics of Mildwind. If you need any help in-game, just type \"help\" at any time. To continue with the main story, press enter.")
-	print("=============< Tutorial completed >=============")
+	print("=============< TUTORIAL COMPLETED >=============")
 	part1()
 	
 #part1
@@ -1053,6 +1088,7 @@ def ext_part1():
 		ending = "Hopeless and Stupid"
 		game.player.headbanger = True
 		game.player.hurt(damage, False, damagemsg % (damage), deathmsg, ending)
+		game.player.give_achievement(Achievement.headbanger)
 	elif game.player.command in ["attack", "fight", "a"]:
 		talking("You can't attack behind bars.", .02)
 	elif game.player.command == "talk to prisoner":
@@ -1173,6 +1209,7 @@ def part2():
 		game.player.fullheal()
 		game.player.maxstamina += 5
 		game.player.extattack += 25
+	game.player.give_achievement(Achievement.encounter)
 	commands()
 	
 #part3
@@ -1219,6 +1256,7 @@ def ext_part3():
 				if not game.current_enemy.dead and game.random_chance(16):
 					game.player.hurt(15, False, "A wolf just locked its jaw onto your arm! You must shake it off to continue fighting. You lost 15 more health.")
 					game.player.haswolf = True
+					game.player.give_achievement(Achievement.bitten)
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [0, 4, 10, 15, 20]):
 			part4()
@@ -1427,6 +1465,7 @@ def ext_part8():
 		game.player.attack_enemy(game.current_enemy, False)
 		if game.current_enemy.dead:
 			game.player.armor = game.player.armorbank
+			game.player.give_achievement(Achievement.suicide)
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [0, 15, 20, 45, 50, 60]):
 			part9()
@@ -1793,6 +1832,7 @@ def bruce():
 		time.sleep(5)
 		talking("Here you go! Better than ever.")
 		game.player.give_item(Weapon.dragon_slayer)
+		game.player.give_achievement(Achievement.slayer)
 		game.player.sforged = True
 		if game.player.shell:
 			talking("Ah, you also brought back some scorpion shell! Let me make that into armor for you.")
@@ -1800,12 +1840,14 @@ def bruce():
 			print("You now have Scorpio Armor!")
 			game.player.sarmor = True
 			game.player.give_item(Armor.scorpio_armor)
+			game.player.give_achievement(Achievement.scorpio)
 		redwind()
 	elif (game.player.sshield and game.player.forged) and game.player.dracordReady == False:
 		talking("\"Ah, are you ready to defeat Dracord?\"")
 		time.sleep(1)
 		talking("\"Great! Go after him!\"")
 		game.player.dracordReady = True
+		game.player.give_achievement(Achievement.battleready)
 		redwind()
 	else:
 		print("Bruce doesn't have anything to tell you.")
@@ -2020,6 +2062,7 @@ def swamp_3():
 	time.sleep(7)
 	talking("Under the pedestal reads \"Shield of the Gods\". You pick it up and feel its power.")
 	game.player.give_item(Shield.shield_of_the_gods)
+	game.plaer.give_achievement(Achievement.godly)
 	game.player.sshield = True
 	talking("You return to the village.")
 	time.sleep(6)
@@ -2207,6 +2250,7 @@ def forest():
 		herbs = random.choice([8, 9, 10, 11, 12, 13, 14, 15, 16])
 		print("You found ", herbs, " herbs.")
 		game.player.give_item(Item.herb, herbs)
+		game.player.give_achievement(Achievement.farmer)
 		time.sleep(3)
 		redwind()
 	else:
@@ -2404,6 +2448,7 @@ def ext_river():
 							game.player.maxstamina += 2
 							game.player.fullheal()
 							talking("Your stamina and health increased.")
+							game.player.give_achievement(Achievement.stranger)
 						else:
 							print("Not enough herbs.")
 					except TypeError:
