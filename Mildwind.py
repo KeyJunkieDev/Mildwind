@@ -33,16 +33,6 @@ logging.basicConfig(filename='log.log', level=logging.DEBUG)
 logging.debug("Game version: %s" % (version))
 logging.debug("If you are experiencing issues, or feel like some commands should be added, copy and paste this log to http://pastebin.com/ and send the link to Keyboard Junkie Dev Team or Ratchet Miles.")
 
-#todo
-'''
--Decrease lines of code used (If possible)
--Tweak difficulty and chance of death
--Finish help (again)
--Edit tutorial
--Achievements
--Fix how potions are listed in inventory
-'''
-
 #intro
 random_quotes = ["\"Alright, I've been thinking. When life gives you lemons, don't make lemonade! Make life take the lemons back! Get mad! I don't want your damn lemons; what am I supposed to do with these? Demand to see life's manager! Make life rue the day it thought it could give Cave Johnson lemons! Do you know who I am? I'm the man who's gonna burn your house down... with the lemons! I'm gonna get my engineers to invent a combustible lemon that burns your house down!\" -Cave Johnson", "\"Is a man not entitled to the sweat of his brow? \"No,\" says the man in Washington, \"it belongs to the poor.\" \"No,\" says the man in the Vatican, \"it belongs to God.\" \"No,\" says the man in Moscow, \"it belongs to everyone.\" I rejected those answers; instead, I chose something different. I chose the impossible. I chose... Rapture. A city where the artist would not fear the censor; where the scientist would not be bound by petty morality; where the great would not be constrained by the small! And with the sweat of your brow, Rapture can become your city as well.\" -Andrew Ryan", "\"A man chooses; a slave obeys.\" -Andrew Ryan", "\"I never asked for this.\" -Adam Jensen", "\"The right man in the wrong place can make all the difference in the world\" -G-Man", "\"Like is says in the book, we are blessed and cursed.\" -Big Smoke", "\"If today were the last day of your life, would you want to do what you're about to do today?\" -Steve Jobs", "\"Try not to become a man of success, but rather try to become a man of value.\" -Albert Einsein", "\"Whoever is careless with the truth in small matters cannot be trusted with important matters.\" -Albert Einsein", "\"Knowledge is knowing that a tomato is a fruit, wisdom is not putting it in a fruit salad.\" -Miles Kington"]
 
@@ -89,6 +79,14 @@ help = "=< HELP >=\nObjective: The objective of the game is to type commands to 
 player_stats = "=< STATS >=\nName: %s\nHealth: %s/%s\nItems:\n Weapon: %s \n Armor: %s \n Shield: %s\nArmor: %s\nWeapon Damage: %s\nAttack: %s\nStamina: %s/%s\nInventory:\n %s\nTime Played: %s"
 
 enemy_stats = "=< ENEMY STATS >=\nName: %s\nHealth: %s\nAttack Damage: %s-%s\nArmor: %s"
+
+small_potion_commands  = ["spot", "smallpot", "smallpotion", "small potion"]
+
+medium_potion_commands = ["mpot", "medpot", "mediumpot", "medpotion", "mediumpotion", "medium potion"]
+
+large_potion_commands  = ["lpot", "lrgpot", "largepot", "lrgpotion", "largepotion", "large potion"]
+
+super_potion_commands  = ["sppot", "suppot", "superpot", "suppotion", "superpotion", "super potion"]
 
 #classes
 class Weapon(Enum):
@@ -145,7 +143,7 @@ class Potion(Enum):
 		return self.value[1]
 
 class Item(Enum):
-	scroll				= "Scroll (Hint)"
+	scroll				= "Scroll"
 	torch				= "Torch"
 	prison_key			= "Prison Key"
 	trans_book			= "Book of the Dragon Language"
@@ -202,6 +200,7 @@ class Player():
 		self.name			= name
 		self.command		= ""
 		self.printer		= True
+		self.printer_speed  = 1
 		self.version		= version
 		self.inventory		= Inventory()
 
@@ -497,13 +496,13 @@ def commands():
 			use_hint()
 		elif game.player.command in ["potion", "use potion", "drink potion", "potions"]:
 			list_potion_types()
-		elif game.player.command in ["spot", "smallpot", "smallpotion", "small potion"]:
+		elif game.player.command in small_potion_commands:
 			use_potion(Potion.small)
-		elif game.player.command in ["mpot", "medpot", "mediumpot", "medpotion", "mediumpotion", "medium potion"]:
+		elif game.player.command in medium_potion_commands:
 			use_potion(Potion.medium)
-		elif game.player.command in ["lpot", "lrgpot", "largepot", "lrgpotion", "largepotion", "large potion"]:
+		elif game.player.command in large_potion_commands:
 			use_potion(Potion.large)
-		elif game.player.command in ["sppot", "suppot", "superpot", "suppotion", "superpotion", "super potion"]:
+		elif game.player.command in super_potion_commands:
 			use_potion(Potion.super)
 		elif game.player.command == "stats":
 			show_player_stats()
@@ -526,7 +525,9 @@ def commands():
 		#elif game.player.command == "achievement":
 			#show_achievement()
 		elif game.player.command == "printing":
-			printingtoggle()
+			toggle_printing()
+		elif game.player.command == "printingspeed":
+			set_printing_speed()
 		elif game.player.command == "credits":
 			show_credits()
 		elif game.player.command == "cheats":
@@ -536,26 +537,48 @@ def commands():
 		else:
 			game.player.cmdext()
 
-def printingtoggle():
+def toggle_printing():
 	game.player.printer = not game.player.printer
 	if game.player.printer:
 		talking("Printing is on.", .04)
 	else:
 		print("Printing is off.")
 
-def talking(phrasetext, texttime=.03):
-	for i in str(phrasetext):
-		if game.player.printer:
+def set_printing_speed():
+	value = input("Choose printing speed (currently %s, default is 1).\n>" % (game.player.printer_speed))
+	try:
+		if float(value) > 0:
+			print("Printing speed set to %s." % float(value))
+			game.player.printer_speed = float(value)
+		else:
+			print("Must be greater than 0.")
+	except ValueError:
+		print("Not a number.")
+
+def talking(text, defaulttexttime=.03):
+	if game.player.printer:
+		texttime = defaulttexttime / game.player.printer_speed
+
+		for i, ch in enumerate(str(text)):
+			try:
+				nextch = text[i + 1]
+			except:
+				nextch = ""
+
+			sys.stdout.write(ch)
+			sys.stdout.flush()
 			time.sleep(texttime)
-		sys.stdout.write(i)
-		sys.stdout.flush()
-		if game.player.printer:
-			if i in [".", "!", "?", ":"]:
-				time.sleep(texttime*5)
-			elif i in [",", ";"]:
-				time.sleep(texttime*3)
-	time.sleep(.55)
-	print()
+
+			if nextch == " ":
+				if ch in [".", "!", "?", ":"]:
+					time.sleep(texttime * 5)
+				elif ch in [",", ";"]:
+					time.sleep(texttime * 3)
+
+		time.sleep(.55)
+		print()
+	else:
+		print(text)
 	
 def talking_TEST_DO_NOT_REMOVE(phrasetext, texttime=.03):
 	p = [".", "!", "?", ":"]
@@ -602,7 +625,7 @@ def use_potion(type):
 			game.player.fullheal()
 		else:
 			game.player.heal(type.healing())
-		print("Potion used. Your health is now %s." % (game.player.gethealth()))
+		print("%s used. Your health is now %s." % (type.name(), game.player.gethealth()))
 		game.player.take_item(type, 1)
 
 def show_player_stats():
@@ -630,7 +653,28 @@ def show_player_stats():
 	if_not_zero("Stamina:        ", game.player.stamina, game.player.maxstamina)
 
 	print("Inventory:")
+	potions = []
+	scrolls = []
+	other = []
 	for item in game.player.inventory.items:
+		if "Potion" in item.type.name():
+			potions.append(item)
+		elif item.type == Item.scroll:
+			scrolls.append(item)
+		else:
+			other.append(item)
+		itemstring = ""
+	for item in potions:
+		itemstring = " %s (+%s health)" % (item.type.name(), item.type.healing())
+		if item.amount > 1:
+			itemstring += " (%s)" % (item.amount)
+		print(itemstring)
+	for item in scrolls:
+		itemstring = " %s (hint)" % (item.type.name())
+		if item.amount > 1:
+			itemstring += " (%s)" % (item.amount)
+		print(itemstring)
+	for item in other:
 		itemstring = " %s" % (item.type.name())
 		if item.amount > 1:
 			itemstring += " (%s)" % (item.amount)
@@ -658,12 +702,11 @@ def show_help():
 		elif helpcmd == "objective":
 			print("Objective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.")
 		elif helpcmd == "commands":
-			print("Common commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Uses a potion.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-reload: Loads game from last save.\n-Exit, kill, quit, and close: Close the game.")
+			print("Common commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Shows the potion command list.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health, inventory, and achievements.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-reload: Loads from the last save.\n-Exit, kill, quit, and close: Close the game, or close this help menu.")
 		elif helpcmd == "stats":
-			print("Stats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Your strength is how strong you are. Potions are a limited resource that restore 40 health per use. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.")
+			print("Stats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Your strength is how strong you are. Potions are a limited resource that restore health. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.")
 		elif helpcmd == "potions":
 			print("Potions: Potions heal you. There are many different types of potions though. There are small potions which heal 25 health, medium potions which heal 40 health, large potions which heal 100 health, and super potions which heal to your max health.\n")
-			print("Potion Commands:\nSmall Potion:\n spot\n smallpot\n smallpotion\n small potion\nMedium Potions:\n mpot\n medpot\n mediumpot\n medpotion\n mediumpotion\n medium potion\nLarge Potions:\n lpot\n lrgpot\n largepot\n lrgpotion\n largepotion\n large potion\nSuper Potions:\n sppot\n suppot\n superpot\n suppotion\n superpotion\n super potion\n")
 		elif helpcmd == "hints":
 			print("Hints: Also known as scrolls, hints can be used to help you when you are lost or stuck in an area. Hints are limited but can be found by fighting enemies or talking to people.")
 		elif helpcmd in ["exit", "quit", "kill", "close"]:
@@ -934,32 +977,37 @@ def log_stats(part):
 	logging.info("Part " + part + " Stats:" + "\n" + player_stats % ("game.player", game.player.gethealth(), game.player.maxhealth, game.player.weapon.name(), game.player.armor.name(), game.player.shield.name(), game.player.armor.armor(), game.player.weapon.damage(), game.player.get_attack_damage(), game.player.stamina, game.player.maxstamina, game.player.inventory, get_time_played()) + "\n" + "Cheated: " + str(game.player.cheated))
 	
 #===========================actual game===========================
-	
+
 #tutorial
 def tutorial():
 	talking("Welcome to Mildwind! In this tutorial, I will guide you on how the basics of the game work.", .04)
 	while True:
-		tuthint = input("Firstly, let's show you what to do when you're stuck. When you don't know what to do, just type \"hint\". Using the hint command will subtract one hint from your stats. Hints are also known as scrolls. You can find them throughout Mildwind. Use \"hint\" now.\n>").lower()
+		tuthint = input("Firstly, let's show you what to do when you're stuck. You can find hint scrolls throughout Mildwind. When you don't know what to do, just type \"hint\" to use one. Use \"hint\" now.\n>").lower()
 		if tuthint == "hint":
-			talking("Great! You just used a hint. (This hint use will not count against you in the actual game)")
+			talking("Great! You just used a hint.")
 			print("You have 2 hint(s) left.")
 			break
 		else:
-			talking("That's not how you use hints. Try again (Type \"hint\").", .04)
+			talking("That's not how you use hints. Try again (type \"hint\").", .04)
 	while True:
-		tutpotion = input("You look a little hurt, drink a potion. To drink a potion, just type \"potion\". Potions can be found often and will be critical to your survival later on in Mildwind. Use \"potion\" now.\n>").lower()
+		tutpotion = input("You look a little hurt. You can drink potions to restore your health. They can be found often and will be critical to your survival later on in Mildwind. Use \"potion\" to see the list of potion commands.\n>").lower()
 		if tutpotion == "potion":
-			print("Potion used. Your health is now maxed.")
-			break
+			list_potion_types()
+			tutpotion2 = input("This list shows all of the potion commands you can use. Use any potion to continue.\n>")
+			if tutpotion2 in small_potion_commands or tutpotion2 in medium_potion_commands or tutpotion2 in large_potion_commands or tutpotion2 in super_potion_commands:
+				print("Potion used. Your health is now %s." % (game.player.maxhealth))
+				break
+			else:
+				talking("That's not how you use potions. Try again.", .04)
 		else:
-			talking("That's not how you use potions. Try again (Type \"potion\").", .04)
+			talking("That's not how you use potions. Try again (type \"potion\").", .04)
 	while True:
 		tutattack = input("LOOK OUT! There's a wolf coming right at you! To attack enemies, type \"attack\".\n>").lower()
-		if tutattack == "attack":
+		if tutattack in ["attack", "fight", "a"]:
 			print("You defeated the wolf.")
 			break
 		else:
-			talking("That's not how you use attacks. Try again (Type \"attack\").", .04)
+			talking("That's not how you use attacks. Try again (type \"attack\").", .04)
 	while True:
 		tutgeneral = input("Sometimes the game won't tell you what to do. For instance: \"There is a door in front of you.\" What do you think you have to do here?\n>").lower()
 		if tutgeneral in ["door", "open door", "open the door"]:
@@ -969,13 +1017,14 @@ def tutorial():
 		else:
 			print("Try \"open door\".")
 	while True:
-		tutstats = input("Have you ever wondered how much health you have left? You can easily view your stats using the \"stats\" command.\n>").lower()
+		tutstats = input("Have you ever wondered how much health you have left, or what items are in your inventory? You can easily view your stats using the \"stats\" command. Try it now.\n>").lower()
 		if tutstats == "stats":
 			show_player_stats()
 			break
 		else:
-			print("That's not how you use stats. Try again (Type \"stats\").")
+			print("That's not how you use stats. Try again (type \"stats\").")
 	input("Good! You've learned the basics of Mildwind. If you need any help in-game, just type \"help\" at any time. To continue with the main story, press enter.")
+	print("=============< Tutorial completed >=============")
 	part1()
 	
 #part1
@@ -1020,7 +1069,7 @@ def ext_part1():
 			if game.player.headbanger:
 				talking("\"I see that your head is bleeding...take this bandage.\" Your health is now restored to max.")
 				game.player.fullheal()
-			talking("You were given 2 small potions and a mysterious one. The prisoner recommended that you drink the mysterious one, so you did. Your max health increased a little.", .04)
+			talking("You were given 2 small potions and a mysterious one. The prisoner recommended that you drink the mysterious one, so you did. Your max health increased a little.", .02)
 	elif game.player.command == "wait":
 		if game.player.stolen:
 			talking("You wait. Nothing happened.", .02)
@@ -1039,12 +1088,12 @@ def ext_part1():
 			if game.player.hints > 0:
 				game.player.hints = game.player.hints - 1
 		else:	
-			talking("As the guard passes by, you reach in his pocket and grabbed some items. You found a dagger, scroll, and key.")
+			talking("As the guard passes by, you reach in his pocket and grabbed some items. You found a dagger, a scroll, and a key.")
 			game.player.give_item(Item.scroll)
 			game.player.give_item(Weapon.dagger)
 			game.player.give_item(Item.prison_key)
 			game.player.stolen = True
-	elif game.player.command in ["open door", "unlock door"]:
+	elif game.player.command in ["open door", "open the door", "unlock door", "unlock the door"]:
 		if game.player.has_item(Item.prison_key):
 			game.player.take_item(Item.prison_key)
 			part1_1()
