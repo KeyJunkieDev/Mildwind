@@ -2,8 +2,8 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-version = "Beta 0.9.0.0-EXPERIMENTAL"
-experimental_version = True
+version = "Beta 1.0.0.0"
+experimental_version = False
 
 credits = '''
            :dNdhs+\-._              	=============< Mildwind >=============
@@ -192,6 +192,10 @@ class Achievement(Enum):
 	stranger		= ("Stranger",			"Make a strange potion")
 	battleready		= ("Battleready",		"Be prepared to fight Dracord")
 	slayer			= ("Slayer",			"Create the Dragon Slayer sword")
+	learning		= ("I'M LEARNING!",		"Complete the tutorial")
+	horse			= ("PONIES!!!",			"You like ponies don't you?")
+	wait			= ("Wait",				"Wait for something to happen")
+	winner			= ("WINNER!",			"Defeat Dracord")
 
 	def name(self):
 		return self.value[0]
@@ -712,7 +716,7 @@ def show_achievements():
 		print("You have not earned any achievements yet.")
 	else:
 		for achievement in game.player.achievements:
-			print("%s - %s" % (achievement.name(), achievement.requirement()))
+			print("%s: %s" % (achievement.name(), achievement.requirement()))
 
 def toggle_achievement_messages():
 	game.player.showachievemsg = not game.player.showachievemsg
@@ -1060,6 +1064,7 @@ def tutorial():
 			print("That's not how you use stats. Try again (type \"stats\").")
 	input("Good! You've learned the basics of Mildwind. If you need any help in-game, just type \"help\" at any time. To continue with the main story, press enter.")
 	print("=============< TUTORIAL COMPLETED >=============")
+	game.player.give_achievement(Achievement.learning)
 	part1()
 	
 #part1
@@ -1115,6 +1120,7 @@ def ext_part1():
 			game.player.give_item(Weapon.steel_sword)
 			game.player.give_item(Armor.leather_armor)
 			print("Weapon damage increased to 4, armor increased to 1.5, and a hint added.")
+			game.player.give_achievement(Achievement.wait)
 			part2()
 	elif game.player.command in ["pickpocket guard", "steal", "pickpocket", "steal from guard", "pick guards pocket", "pick pocket", "take from guard", "reach into guards pocket"]:
 		if game.player.stolen:
@@ -1282,6 +1288,7 @@ def ext_part4():
 	if game.player.command == "ponies!!!":
 		game.player.extattack += 15
 		talking("You found a purple princess pony. She will now follow you and add 15 damage to your attacks.")
+		game.player.give_achievement(Achievement.horse)
 	elif game.player.command in ["skeleton", "examine skeleton", "examine", "check", "check skeleton", "loot", "loot skeleton", "look at skeleton", "scavenge", "scavenge skeleton"]:
 		if game.player.hasitems:
 			talking("You mourn over the death of the knight.")
@@ -2062,7 +2069,7 @@ def swamp_3():
 	time.sleep(7)
 	talking("Under the pedestal reads \"Shield of the Gods\". You pick it up and feel its power.")
 	game.player.give_item(Shield.shield_of_the_gods)
-	game.plaer.give_achievement(Achievement.godly)
+	game.player.give_achievement(Achievement.godly)
 	game.player.sshield = True
 	talking("You return to the village.")
 	time.sleep(6)
@@ -2532,7 +2539,7 @@ def final_battle():
 	game.player.cmdext = ext_final_battle
 	if game.player.dracordReady:
 		time.sleep(3)
-		talking("You bravely walk into Dracord's lair. You drag your sword across the floor to announce your precense. Dracord growls. It is time to battle.")
+		talking("You bravely walk into Dracord's lair. You drag your sword across the floor to announce your presense. Dracord growls. It is time to battle.")
 		commands()
 	else:
 		if game.player.dracordTry:
@@ -2561,11 +2568,12 @@ def final_battle():
 def end():
 	time.sleep(1)
 	log_stats("End")
-	show_player_stats()
+	game.player.give_achievement(Achievement.winner)
 	talking("This is it. This is the end of the line... You beat Dracord and saved the world. From what, you don't know. You walk back to Redwind to share the news, but it seems everyone already knows.", .05)
 	talking("Bruce runs to you. \"%s! You did it! You defeated Dracord!\"" % (game.player.name), .04)
 	talking("\"Why was Dracord a threat? Dracord was defeated years ago. He was burning villages and eating citizens. The sky turned blood-red. He was defeated by Maxwell Mileway. Maxwell was the only person able to kill him because he had Dragon Blood in his veins. You are part of the Mileway family, and when we heard he was back, we needed to find you. Ruffin was friends with your parents. Too bad they won't be able to see what you've done for us...\"", .05)
 	talking("\"Anywho, let us celebrate your victory!\"")
+	show_player_stats()
 	talking(".....")
 	show_credits()
 	talking("....................", .1)
