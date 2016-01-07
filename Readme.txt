@@ -27,6 +27,11 @@ Be sure to test every command and possible combination I can throw at you to try
 ==================================================
 
 Changelog
+1.0
+-Bug fixes
+-Added commands
+-More achievements
+
 0.9.0.0
 -Added achievements
 -Added "achievementmessages" command (toggles "achievement earned" messages)
