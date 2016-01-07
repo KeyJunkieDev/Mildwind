@@ -2,11 +2,8 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-<<<<<<< HEAD
-version = "1.0"
-=======
+
 version = "1.0.1"
->>>>>>> 1.0.1
 experimental_version = False
 
 credits = '''
@@ -1116,11 +1113,7 @@ def ext_part1():
 			print("Weapon damage increased to 4, armor increased to 1.5, and a hint added.")
 			game.player.give_achievement(Achievement.wait)
 			part2()
-<<<<<<< HEAD
-	elif game.player.command in ["pickpocket guard", "steal", "pickpocket", "steal from guard", "pick guards pocket", "pick pocket", "take from guard", "reach into guards pocket", "reach", "grab key", "grab", "reach for key"]:
-=======
-	elif game.player.command in ["pickpocket guard", "steal", "pickpocket", "steal from guard", "pick guard's pocket", "pick pocket", "take from guard", "reach into guard's pocket", "take"]:
->>>>>>> 1.0.1
+	elif game.player.command in ["pickpocket guard", "steal", "pickpocket", "steal from guard", "pick guard's pocket", "pick pocket", "take from guard", "reach into guard's pocket", "take", "reach into guards pocket", "reach", "grab key", "grab", "reach for key"]:
 		if game.player.stolen:
 			damage = 20
 			damagemsg = "The guard shouts \"Hey, I saw that!\" and shanks you for stealing. You lost %s health."

@@ -27,20 +27,16 @@ Be sure to test every command and possible combination I can throw at you to try
 ==================================================
 
 Changelog
-<<<<<<< HEAD
+1.0.1
+-Added printing effect for text input messages
+-Bug fixes
+
 1.0
 -Bug fixes
 -Added commands
 -More achievements
 
 0.9.0.0
-=======
-1.0.1
--Added printing effect for text input messages
--Bug fixes
-
-1.0
->>>>>>> 1.0.1
 -Added achievements
 -Added "achievementmessages" command (toggles "achievement earned" messages)
 -Added "printingspeed" command (changes the text printing speed)
