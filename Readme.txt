@@ -18,7 +18,7 @@ achievementmessages - toggles "achievement earned" message when you get an achie
 
 ==================================================
 
-Save files from before Beta 0.9.0.0 are incompatible with the current version
+Save files from before 1.0 are incompatible with the latest version
 
 If you could, please send me your log using Pastebin once you've completed the game: http://pastebin.com/
 
@@ -27,7 +27,11 @@ Be sure to test every command and possible combination I can throw at you to try
 ==================================================
 
 Changelog
-0.9.0.0
+1.0.1
+-Added printing effect for text input messages
+-Bug fixes
+
+1.0
 -Added achievements
 -Added "achievementmessages" command (toggles "achievement earned" messages)
 -Added "printingspeed" command (changes the text printing speed)

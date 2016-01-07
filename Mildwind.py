@@ -2,8 +2,8 @@ import re, random, logging, os, sys, pickle, time, traceback
 from enum import Enum
 
 #version
-version = "Beta 0.9.0.0-EXPERIMENTAL"
-experimental_version = True
+version = "1.0.1"
+experimental_version = False
 
 credits = '''
            :dNdhs+\-._              	=============< Mildwind >=============
@@ -74,7 +74,7 @@ if experimental_version:
 	print("NOTE: THIS IS AN EXPERIMENTAL BUILD OF MILDWIND -PLEASE- TELL ME IF THERE ARE ANY PROBLEMS YOU COME PAST.\n")
 
 #variables
-help = "=< HELP >=\nObjective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.\n\nStats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Potions are a limited resource that restore 40 health per use. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.\n\nCommon commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Uses a potion.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-Reload: Loads game from last save.\n-Exit, kill, quit, and close: Close the game."
+help = "=< HELP >=\nObjective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.\n\nStats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Potions are a limited resource that restore 40 health per use. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.\n\nCommon commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Uses a potion.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health and inventory.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-Reload: Loads game from last save.\n-Exit, kill, quit, and close: Close the game."
 
 player_stats = "=< STATS >=\nName: %s\nHealth: %s/%s\nItems:\n Weapon: %s \n Armor: %s \n Shield: %s\nArmor: %s\nWeapon Damage: %s\nAttack: %s\nStamina: %s/%s\nInventory:\n %s\nTime Played: %s"
 
@@ -329,7 +329,7 @@ class Player():
 								self.give_items(game.current_enemy.rewards)
 								talking(enemy.shieldkilledmsg.format(self.gethealth()), .02)
 							else:
-								print(enemy.shieldmsg.format(enemy.health, self.gethealth()))
+								talking(enemy.shieldmsg.format(enemy.health, self.gethealth()), 0.01)
 		else:
 			talking("You don't have a shield.", .02)
 
@@ -492,7 +492,7 @@ def load():
 	
 def choose_name():
 	while True:
-		game.player.name = input("Identify yourself (Just press enter to use your PC's name)\n>")
+		game.player.name = input("Identify yourself. (just press enter to use your PC's name)\n>")
 		if game.player.name == "":
 			print("Nothing entered. Using system name.")
 			game.player.name = os.getlogin()
@@ -564,7 +564,7 @@ def toggle_printing():
 		print("Printing is off.")
 
 def set_printing_speed():
-	value = input("Choose printing speed (currently %s, default is 1).\n>" % (game.player.printer_speed))
+	value = print_input("Choose printing speed (currently %s, default is 1)." % (game.player.printer_speed))
 	try:
 		if float(value) > 0:
 			print("Printing speed set to %s." % float(value))
@@ -594,27 +594,14 @@ def talking(text, defaulttexttime=.03):
 				elif ch in [",", ";"]:
 					time.sleep(texttime * 3)
 
-		time.sleep(.55)
+		time.sleep(.3)
 		print()
 	else:
 		print(text)
-	
-def talking_TEST_DO_NOT_REMOVE(phrasetext, texttime=.03):
-	p = [".", "!", "?", ":"]
-	p2 = [",", ";"]
-	for i, c in enumerate(str(phrasetext)):
-		nc = phrasetext[i]
-		if game.player.printer:
-			time.sleep(texttime)
-		sys.stdout.write(c)
-		sys.stdout.flush()
-		if nc not in ["\""] and nc not in p and nc not in p2:
-			if c in p:
-				time.sleep(texttime * 10)
-			elif c in p2:
-				time.sleep(texttime * 3)
-	time.sleep(.75)
-	print()
+
+def print_input(text, defaulttexttime=.03, input_text=">"):
+	talking(text, defaulttexttime)
+	return input(input_text)
 
 def show_credits():
 	print(credits)
@@ -626,7 +613,7 @@ def use_hint():
 	if game.player.has_item(Item.scroll):
 		game.player.take_item(Item.scroll)
 		talking(random.choice(game.player.randhint), .02)
-		print("You have %s scroll(s) left." % (game.player.get_item_amount(Item.scroll)))
+		talking("You have %s scroll(s) left." % (game.player.get_item_amount(Item.scroll)), 0.02)
 	else:
 		talking("You don't have any scrolls to use.")
 
@@ -644,8 +631,8 @@ def use_potion(type):
 			game.player.fullheal()
 		else:
 			game.player.heal(type.healing())
-		print("%s used. Your health is now %s." % (type.name(), game.player.gethealth()))
 		game.player.take_item(type, 1)
+		talking("%s used. Your health is now %s." % (type.name(), game.player.gethealth()), 0.02)
 
 def show_player_stats():
 	def if_not_zero(statname, amount, maxamount):
@@ -737,8 +724,8 @@ def show_help():
 		elif helpcmd == "objective":
 			print("Objective: The objective of the game is to type commands to beat the game. You simply type a command and read the results.")
 		elif helpcmd == "commands":
-			print("Common commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Shows the potion command list.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health, inventory, and achievements.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-reload: Loads from the last save.\n-Exit, kill, quit, and close: Close the game, or close this help menu.")
-		elif helpcmd == "stats":
+			print("Common commands:\n-Help: Brings up this menu.\n-Hint: Gives you a hint as to what to do.\n-Potion: Shows the potion command list.\n-Attack: Cannot be used all the time, but is used to battle enemies.\n-Shield: Cannot be used all the time, but can give a small amount of damage and regenerate a little health. Uses stamina.\n-Continue, Press forward, Follow, etc: Cannot be used all the time, but is used to progress to the next chapter.\n-Stats: Displays stats such as health and inventory.\n-Newname: Gives you the option to change your name.\n-Newgame: Gives you the option to start a new game. \n-reload: Loads from the last save.\n-Exit, kill, quit, and close: Close the game, or close this help menu.")
+		elif helpcmd == "stats": 
 			print("Stats: You can view your stats using the \"stats\" command. Your health is, well, your health. Armor reduces your health damage. Your strength is how strong you are. Potions are a limited resource that restore health. Attack is how much damage you give per hit. Stamina is how much strength you have. This is degraded when you use your shield and regained when the chapter ends. Hints are a limited amount of tips that assist you when you're stuck. These are also known as scrolls.")
 		elif helpcmd == "potions":
 			print("Potions: Potions heal you. There are many different types of potions though. There are small potions which heal 25 health, medium potions which heal 40 health, large potions which heal 100 health, and super potions which heal to your max health.\n")
@@ -897,14 +884,14 @@ def show_cheats():
 
 def change_name():
 	while True:
-		newname = input("Identify yourself\n>")
+		newname = print_input("Identify yourself")
 		if newname == "":
 			print("Nothing entered!")
 		elif re.match(r'^[A-Za-z0-9 _~-]+$', newname):
 			break
 		else:
 			print("Invalid use of characters.")
-		check = input("Are you sure? (y/n)\n>").lower()
+		check = print_input("Are you sure? (y/n)").lower()
 		if check == "y":
 			game.player.name = newname
 			talking("Your name is now %s" % (game.player.name))
@@ -914,7 +901,7 @@ def change_name():
 			break
 			
 def quit():
-	check = input("Are you sure you want to quit? (y/n)\n>").lower()
+	check = print_input("Are you sure you want to quit? (y/n)").lower()
 	while True:
 		if check == "y":
 			sys.exit()
@@ -923,14 +910,14 @@ def quit():
 			break
 
 def show_survey():
-	input("When doing this survey, remember to be very descriptive, and you can't press enter to add a new paragraph. Enter goes to the next question.")
-	survey1 = input("On a scale of 1 - 10, what do you think of Mildwind so far?\n>")
+	print_input("When doing this survey, remember to be very descriptive, and you can't press enter to add a new paragraph. Enter goes to the next question.", .01, "")
+	survey1 = print_input("On a scale of 1 - 10, what do you think of Mildwind so far?")
 	logging.info("Question 1 \"On a scale of 1 - 10, what do you think of Mildwind so far?\": " + survey1)
-	survey2 = input("Are there any commands I should add? Where?\n>")
+	survey2 = print_input("Are there any commands I should add? Where?")
 	logging.info("Question 2 \"Are there any commands I should add? Where?\": " + survey2)
-	survey3 = input("What problems have you faced?\n>")
+	survey3 = print_input("What problems have you faced?")
 	logging.info("Question 3 \"What problems have you faced?\": " + survey3)
-	survey4 = input("How could I improve the game?\n>")
+	survey4 = print_input("How could I improve the game?")
 	logging.info("Question 4 \"How could I improve the game?\": " + survey4)
 	input("Thank you for doing the survey. In order for me to see your answers, you must follow the instructions in the log or readme file.")
 
@@ -956,7 +943,7 @@ def end_game(winlose):
 			game.player.savepos()
 		elif choice == "quit":
 			print("Don't forget to send me your log if you don't mind (More info about that in the readme file)!")
-			survey = input("Would you like to take a survey to help me improve my game? The survey answers will be saved in the log file. (y/n)\n>").lower()
+			survey = print_input("Would you like to take a survey to help me improve my game? The survey answers will be saved in the log file. (y/n)").lower()
 			if survey == "y":
 				show_survey()
 				sys.exit()
@@ -980,14 +967,14 @@ def reset_stats():
 			
 def clear_console():
 	clear = "\n" * 100
-	choice = input("Would you like to clear the console? This cannot be undone. (y/n)\n>").lower()
+	choice = print_input("Would you like to clear the console? This cannot be undone. (y/n)", 0.02).lower()
 	if choice == "y":
 		print(clear)
 	else:
 		print("Resuming game")
 		
 def start_new_game():
-	choice = input("Would you like to start a new game? (y/n)\n>").lower()
+	choice = print_input("Would you like to start a new game? (y/n)", 0.02).lower()
 	if choice == "y":
 		reset_stats()
 		game.set_start_time()
@@ -997,7 +984,7 @@ def start_new_game():
 		print("Resuming game")
 		
 def reload():
-	choice = input("Would you like to load from the last checkpoint? (y/n)\n>").lower()
+	choice = print_input("Would you like to load from the last checkpoint? (y/n)", 0.02).lower()
 	if choice == "y":
 		print("\n")
 		load()
@@ -1017,48 +1004,51 @@ def log_stats(part):
 def tutorial():
 	talking("Welcome to Mildwind! In this tutorial, I will guide you on how the basics of the game work.", .04)
 	while True:
-		tuthint = input("Firstly, let's show you what to do when you're stuck. You can find hint scrolls throughout Mildwind. When you don't know what to do, just type \"hint\" to use one. Use \"hint\" now.\n>").lower()
+		tuthint = print_input("Firstly, let's show you what to do when you're stuck. You can find hint scrolls throughout Mildwind. When you don't know what to do, just type \"hint\" to use one. Use \"hint\" now.").lower()
 		if tuthint == "hint":
 			talking("Great! You just used a hint.")
-			print("You have 2 hint(s) left.")
+			talking("You have 3 scroll(s) left.", 0.02)
 			break
 		else:
 			talking("That's not how you use hints. Try again (type \"hint\").", .04)
 	while True:
-		tutpotion = input("You look a little hurt. You can drink potions to restore your health. They can be found often and will be critical to your survival later on in Mildwind. Use \"potion\" to see the list of potion commands.\n>").lower()
+		tutpotion = print_input("You look a little hurt. You can drink potions to restore your health. They can be found often and will be critical to your survival later on in Mildwind. Use \"potion\" to see the list of potion commands.").lower()
 		if tutpotion == "potion":
 			list_potion_types()
-			tutpotion2 = input("This list shows all of the potion commands you can use. Use any potion to continue.\n>")
+			time.sleep(2)
+			tutpotion2 = print_input("This list shows all of the potion commands you can use. Use any potion to continue.")
 			if tutpotion2 in small_potion_commands or tutpotion2 in medium_potion_commands or tutpotion2 in large_potion_commands or tutpotion2 in super_potion_commands:
-				print("Potion used. Your health is now %s." % (game.player.maxhealth))
+				talking("Potion used. Your health is now %s." % (game.player.maxhealth), 0.02)
 				break
 			else:
 				talking("That's not how you use potions. Try again.", .04)
 		else:
 			talking("That's not how you use potions. Try again (type \"potion\").", .04)
 	while True:
-		tutattack = input("LOOK OUT! There's a wolf coming right at you! To attack enemies, type \"attack\".\n>").lower()
+		tutattack = print_input("LOOK OUT! There's a wolf coming right at you! To attack enemies, type \"attack\".").lower()
 		if tutattack in ["attack", "fight", "a"]:
-			print("You defeated the wolf.")
+			talking("You defeated the wolf.", 0.02)
 			break
 		else:
 			talking("That's not how you use attacks. Try again (type \"attack\").", .04)
 	while True:
-		tutgeneral = input("Sometimes the game won't tell you what to do. For instance: \"There is a door in front of you.\" What do you think you have to do here?\n>").lower()
+		tutgeneral = print_input("Sometimes the game won't tell you what to do. For instance: \"There is a door in front of you.\" What do you think you have to do here?").lower()
 		if tutgeneral in ["door", "open door", "open the door"]:
 			talking("You opened the door and went into the next room.", .05)
 			talking("Good! When playing Mildwind, be sure to read carefully. You may need to do certain actions to get things you may need. In some instances, you won't even be able to progress without trying to figure out what to do on your own. If you ever get stuck, remember to use \"hint\", but also know that hints are limited.", .05)
 			break
 		else:
-			print("Try \"open door\".")
+			talking("Try \"open door\".", 0.04)
 	while True:
-		tutstats = input("Have you ever wondered how much health you have left, or what items are in your inventory? You can easily view your stats using the \"stats\" command. Try it now.\n>").lower()
+		tutstats = print_input("Have you ever wondered how much health you have left, or what items are in your inventory? You can easily view your stats using the \"stats\" command. Try it now.").lower()
 		if tutstats == "stats":
 			show_player_stats()
 			break
 		else:
 			print("That's not how you use stats. Try again (type \"stats\").")
-	input("Good! You've learned the basics of Mildwind. If you need any help in-game, just type \"help\" at any time. To continue with the main story, press enter.")
+
+	time.sleep(2)
+	print_input("Good! You've learned the basics of Mildwind. If you need any help in-game, just type \"help\" at any time. To continue with the main story, press enter.", 0.04)
 	print("=============< TUTORIAL COMPLETED >=============")
 	part1()
 	
@@ -1091,7 +1081,7 @@ def ext_part1():
 		game.player.give_achievement(Achievement.headbanger)
 	elif game.player.command in ["attack", "fight", "a"]:
 		talking("You can't attack behind bars.", .02)
-	elif game.player.command == "talk to prisoner":
+	elif game.player.command in ["talk to prisoner", "prisoner"]:
 		if game.player.hasitems:
 			talking("I have nothing else to say...", .04)
 		else:
@@ -1116,7 +1106,7 @@ def ext_part1():
 			game.player.give_item(Armor.leather_armor)
 			print("Weapon damage increased to 4, armor increased to 1.5, and a hint added.")
 			part2()
-	elif game.player.command in ["pickpocket guard", "steal", "pickpocket", "steal from guard", "pick guards pocket", "pick pocket", "take from guard", "reach into guards pocket"]:
+	elif game.player.command in ["pickpocket guard", "steal", "pickpocket", "steal from guard", "pick guard's pocket", "pick pocket", "take from guard", "reach into guard's pocket", "take"]:
 		if game.player.stolen:
 			damage = 20
 			damagemsg = "The guard shouts \"Hey, I saw that!\" and shanks you for stealing. You lost %s health."
@@ -1292,7 +1282,7 @@ def ext_part4():
 			game.player.hasitems = True
 			game.player.give_item(Shield.wooden_shield)
 			game.player.give_item(Armor.rusty_armor)
-			talking("The skeleton has rusty old armor and wooden shield. Your armor is now increased to 1.4. You can now use \"shield\" to defend yourself from enemies and give a small amount of damage.")
+			talking("The skeleton has rusty old armor and a wooden shield. Your armor is increased to 1.4. You can now use \"shield\" to defend yourself from enemies and give a small amount of damage.")
 	elif game.player.command == "shield":
 		if game.player.shield == Shield.none:
 			talking("You don't have a shield.")
@@ -1591,7 +1581,7 @@ def ext_part11():
 			game.player.sethealth(0, "With no other option, you begin to charge towards Dracord without regret. Dracord slams you into the rocky walls and kills you.")
 			talking(dracord_hint)
 		else:
-			talking("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climp up his tail. Dracord felt him climbing up him like a flea and smacked his tail into the ground to shake Ruffin off. Ruffin hit the ground hard.")
+			talking("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord felt him climbing up him like a flea and smacked his tail into the ground to shake Ruffin off. Ruffin hit the ground hard.")
 			talking("")
 			talking("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
 			talking("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
@@ -1627,12 +1617,12 @@ def ext_part12():
 		combo = random.triangular(000, 999)
 		number = "%03d" % int(combo)
 		while True:
-			answer = input("What's the number?\n>")
+			answer = print_input("What's the number?")
 			if answer == number:
 				talking("Door unlocked.")
 				part13()
 			elif len(answer) != 3:
-				print("Number must be 3 digits (000 - 999).")
+				talking("Number must be 3 digits (000 - 999).", 0.02)
 			elif answer > number:
 				talking("Lower...", 0.02)
 			elif answer < number:
@@ -1640,7 +1630,7 @@ def ext_part12():
 			elif answer == "exit":
 				return
 			else:
-				talking("NOT A NUMBER.")
+				talking("Not a number.")
 	else:
 		show_entry_message()
 
@@ -1692,18 +1682,18 @@ def part14():
 	log_stats("13")
 	game.player.cmdext = ext_part14
 	talking("\nAfter a while of following the stream, you pass some bushes. You hear rustling from them when suddenly a pack of wolves jump out.")
-	time.sleep(10)
+	time.sleep(8)
 	talking("\nYou begin to run. As you are running, you start to see a small village in the distance, but you also hear growling and barking from behind.")
-	time.sleep(10)
+	time.sleep(8)
 	talking("\nYou hear a yelp from behind you but don't want to look back. You still hear angry wolves chasing you.")
-	time.sleep(10)
+	time.sleep(8)
 	talking("\nYou hear another cry from a wolf. It gets a bit quiet, but you still hear a wolf chasing you.")
-	time.sleep(10)
+	time.sleep(8)
 	talking("\nYou hear one last thud of a wolf hitting the ground. It begins to feel calm. You slow down and look behind you. The wolves have been shot by arrows.")
-	time.sleep(10)
+	time.sleep(8)
 	talking("\nYou walk toward the village and meet a man holding a bow.")
 	talking("\n\"You alright? You were nearly mauled by those wolves back there. Good thing I was about to go hunting. Stay for a while as you take a break. If you need info, come to my house. By the way, I'm Bruce.\"")
-	talking("You are now in Redwind Village")
+	talking("You are now in Redwind Village.")
 	redwind()
 	
 #redwind
@@ -1784,20 +1774,20 @@ def bruce():
 		talking("\"So, you want to fight a dragon? Who sent you?\"")
 		time.sleep(2)
 		talking("\"Ruffin? I know him! You must be the chosen one! Where is he anyway?\"")
-		time.sleep(5)
+		time.sleep(3)
 		talking("...", 0.6)
-		time.sleep(3)
+		time.sleep(3.5)
 		talking("\"Oh... How sad... He was a great friend and ally...\"")
-		time.sleep(4)
+		time.sleep(1.5)
 		talking("\"Well... He probably wants you to have this... It's directions to Dracord's lair.\"")
-		time.sleep(5)
+		time.sleep(3.5)
 		talking("\"Oh, I forgot to mention, if you need any help, check the library.\"")
-		time.sleep(3)
+		time.sleep(1)
 		talking("Here, take these small potions for your journey.")
 		game.player.give_item(Potion.small, 5)
-		time.sleep(2)
+		time.sleep(0.5)
 		talking("\"Farewell and good luck %s.\"" % (game.player.name))
-		time.sleep(4)
+		time.sleep(1.5)
 		game.player.areas.dracordlair = True
 		game.player.areas.library = True
 		redwind()
@@ -1872,13 +1862,14 @@ def dracord():
 	game.player.stamina = game.player.maxstamina
 	game.player.shielduse = 0
 	game.player.cmdext = ext_dracord
-	time.sleep(2)
+	time.sleep(0.2)
+	print("(To leave, type \"return\")")
+	time.sleep(0.5)
 	talking("You begin walking to Dracord's lair.")
 	time.sleep(4)
-	print("(To leave, type \"return\")")
 	if game.player.dracordUnlock:
 		while True:
-			choice = input("Are you ready to fight Dracord (y/n)?\n>").lower()
+			choice = print_input("Are you ready to fight Dracord (y/n)?").lower()
 			if choice == "y":
 				final_battle()
 			elif choice == "n":
@@ -1900,9 +1891,9 @@ def dracord():
 			else:
 				print("\nYou can now go to the Mountains.")
 				game.player.areas.mountains = True
-			time.sleep(20)
+			time.sleep(10)
 			talking("You decide to return back to the village.")
-			time.sleep(4)
+			time.sleep(3)
 			redwind()
 		else:
 			talking("You don't understand any of the hieroglyph on the door. You return to the village.")
@@ -1941,6 +1932,8 @@ def ext_swamp():
 		show_entry_message()
 	
 def swamp():
+	game.player.savepos = swamp
+	save()
 	en_swamp()
 	log_stats("redwind")
 	game.player.randhint = ["You like turtles, don't you?"]
@@ -2062,7 +2055,7 @@ def swamp_3():
 	time.sleep(7)
 	talking("Under the pedestal reads \"Shield of the Gods\". You pick it up and feel its power.")
 	game.player.give_item(Shield.shield_of_the_gods)
-	game.plaer.give_achievement(Achievement.godly)
+	game.player.give_achievement(Achievement.godly)
 	game.player.sshield = True
 	talking("You return to the village.")
 	time.sleep(6)
@@ -2217,7 +2210,7 @@ def library():
 		game.player.transbook = True
 		game.player.give_item(Item.trans_book)
 	elif game.player.dracordTry and game.player.hasmap == False:
-		talking("\"I saw you going to the mountain earlier. You seem like an adventurer. Here. Have this map I found.\"")
+		talking("\"I saw you going to the mountain earlier. You seem like an adventurer. Here, have this map I found.\"")
 		game.player.hasmap = True
 		game.player.give_item(Item.swamp_map)
 		game.player.areas.swamp = True
@@ -2234,7 +2227,7 @@ def library():
 def forest():
 	talking("You walk to the forest.")
 	time.sleep(2)
-	confirm = input("Would you like to search the forest for herbs (y/n)?\n>")
+	confirm = print_input("Would you like to search the forest for herbs? This will take %s minutes. (y/n)" % (game.player.farmwait))
 	if confirm == "y":
 		talking("Hunting for herbs...")
 		toolbar_width = 60
@@ -2261,7 +2254,7 @@ def northmine():
 	if not game.player.metals:
 		talking("You walk to the mine.")
 		time.sleep(2)
-		confirm = input("Would you like to mine for iron (y/n)?\n>")
+		confirm = print_input("Would you like to mine for iron? This will take %s minutes. (y/n)" % (game.player.minewait))
 		if confirm == "y":
 			talking("Mining...")
 			toolbar_width = 60
@@ -2337,6 +2330,8 @@ def ext_southmine():
 		show_entry_message()
 
 def southmine():
+	game.player.savepos = southmine
+	save()
 	en_southmine()
 	log_stats("redwind")
 	game.player.randhint = ["Squash that scorpion! (attack)"]
@@ -2555,6 +2550,7 @@ def final_battle():
 			talking("You slowly open your eyes. You see a glowing orb.")
 			talking("%s, it's me, Ruffin...at least the spirit of me anyway. You're not ready to fight Dracord. You need a better weapon. Talk to Bruce. He can help you." % (game.player.name))
 			game.player.dracordTry = True
+			time.sleep(2)
 			redwind()
 	
 #end
@@ -2569,7 +2565,7 @@ def end():
 	talking(".....")
 	show_credits()
 	talking("....................", .1)
-	survey = input("Would you like to take a survey to help me improve my game? The survey answers will be saved in the log file. (y/n)\n>").lower()
+	survey = print_input("Would you like to take a survey to help me improve my game? The survey answers will be saved in the log file. (y/n)").lower()
 	if survey == "y":
 		show_survey()
 		sys.exit()
@@ -2598,8 +2594,8 @@ def Save_Manager():
 			printsaves()
 			command = input(">").lower()
 			if command == "delete":
-				file = input("Type the name of the save file you want to delete.\n>")
-				confirm = input("Are you sure you want to delete " + file + " (y/n)?\n>").lower()
+				file = print_input("Type the name of the save file you want to delete.", 0.01)
+				confirm = print_input("Are you sure you want to delete " + file + " (y/n)?", 0.01).lower()
 				if confirm == "y":
 					try:
 						os.remove("saves/" + file)
@@ -2608,7 +2604,7 @@ def Save_Manager():
 				else:
 					print("Back to main menu.")
 			elif command == "exit":
-				confirm = input("Are you sure you want to exit (y/n)?\n>").lower()
+				confirm = print_input("Are you sure you want to exit (y/n)?", 0.01).lower()
 				if confirm == "y":
 					sys.exit()
 				else:
@@ -2626,15 +2622,21 @@ def Save_Manager():
 if not os.path.exists("saves"):
 	os.makedirs("saves")
 
-print("~ Saves ~")
-print(", ".join(map(str, os.listdir("saves"))))
-print("\n")
-
 
 def select():
 	while True:
-		choice = input("Type \"start\" or press enter to start, or \"save manager\" to mangage saves.\n>")
+		saves_exist = os.listdir("saves") != []
+		startmsg = "Type \"start\" or press enter to start{0}.\n>"
+		smmsg = ""
+		if saves_exist:
+			smmsg = ", or \"save manager\" to manage saves"
+
+		choice = input(startmsg.format(smmsg))
 		if choice in ["", "start"]:
+			if saves_exist:
+				print("\n~ Saves ~")
+				print(", ".join(map(str, os.listdir("saves"))))
+				print()
 			start()
 		elif choice == "save manager":
 			Save_Manager()
