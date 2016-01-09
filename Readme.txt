@@ -31,7 +31,7 @@ Changelog
 -Added printing effect for text input messages
 -Bug fixes
 
-1.0
+1.0 
 -Bug fixes
 -Added commands
 -More achievements
