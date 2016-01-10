@@ -3,7 +3,7 @@ from enum import Enum
 
 #version
 
-version = "1.0.1"
+version = "1.0.2"
 experimental_version = False
 
 credits = '''
@@ -1267,7 +1267,7 @@ def part3():
 	log_stats("2")
 	game.player.randhint = ["Try to fight your way out.", "Once you've killed em off, maybe you can press forward.", "Wolves hate fire."]
 	game.player.cmdext = ext_part3
-	talking("\nYou have chosen to follow Ruffin. On your way to the cave that Dracord resides in, you are stopped by a pack of wolves. \"Wolves! If I remember correctly, wolves are afraid of fire!\" Ruffin noted.")
+	talking("\nYou have chosen to follow Ruffin. On your way to the cave dungeon, you are stopped by a pack of wolves. \"Wolves! If I remember correctly, wolves are afraid of fire!\" Ruffin noted.")
 	game.player.haswolf = False
 	commands()
 		
@@ -1571,32 +1571,27 @@ def en_part11():
 
 def ext_part11():
 	dracord_hint = "HINT: It looks like this battle can't be fought alone..."
+	def scene():
+		talking("\"I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord feels him climbing up him like a flea and smacks his tail into the ground to shake Ruffin off. Ruffin hits the ground hard.")
+		talking("")
+		talking("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
+		talking("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
+		talking("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you can attack, he flies up and breaks through the ceiling. Rubble begins to fall and causes the ground to collapse. You fall through and everything goes black...")
+		game.player.ruffindead = True
+		input("Wake up (Press enter).")
+		part12()
 	if game.player.command == "shield":
 		if game.player.ruffindead:
 			game.player.sethealth(0, "You begin to hold up your shield. As soon as you raise it, Dracord whips it out of your hands with his tail and claws you to death.")
 			talking(dracord_hint)
 		else:
-			talking("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord feels him climbing up him like a flea and smacks his tail into the ground to shake Ruffin off. Ruffin hits the ground hard.")
-			talking("")
-			talking("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
-			talking("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
-			talking("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you can attack, he flies up and breaks through the ceiling. Rubble begins to fall and causes the ground to collapse. You fall through and everything goes black...")
-			game.player.ruffindead = True
-			input("Wake up (Press enter).")
-			part12()
+			scene()
 	elif game.player.command in ["attack", "fight", "a"]:
 		if game.player.ruffindead:
 			game.player.sethealth(0, "With no other option, you begin to charge towards Dracord without regret. Dracord slams you into the rocky walls and kills you.")
 			talking(dracord_hint)
 		else:
-			talking("\"Stay here, I'll try to attack him, you stay here and wait for my cue.\" Ruffin runs straight into Dracord without fear. He runs behind Dracord and attempts to climb up his tail. Dracord felt him climbing up him like a flea and smacked his tail into the ground to shake Ruffin off. Ruffin hit the ground hard.")
-			talking("")
-			talking("You run towards Ruffin and drag him into a crack in the walls. \"%s, Dracord can't be defeated with his current power compared to yours... Take this, it will lead you to a village; Redwind... Bruce will help you... I'm not going to make it... Here's my dagger...put me to rest...\"" % (game.player.name))
-			talking("Ruffin handed you his letter regarding Redwind, and his dagger. You take Ruffin's dagger and go for the heart. \"AHH!\" *silence*")
-			talking("You get up and leave the cracks to finish what you and Ruffin started. You raise your weapon and run towards the violent dragon. Before you could attack, he flew up and broke through the ceiling. Rubble began to fall and caused the ground to collapse. You fall through and everything goes black...")
-			game.player.ruffindead = True
-			input("Wake up (Press enter).")
-			part12()
+			scene()
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		game.player.sethealth(0, "You attempt to run away from Dracord. He blows fire at you and you burn to death.")
 	else:
