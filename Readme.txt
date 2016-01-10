@@ -27,6 +27,9 @@ Be sure to test every command and possible combination I can throw at you to try
 ==================================================
 
 Changelog
+1.0.2
+-Bug fixes
+
 1.0.1
 -Added printing effect for text input messages
 -Bug fixes
