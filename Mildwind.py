@@ -1063,7 +1063,7 @@ def en_part1():
 	guard = Enemy("Guard", 100, (5, 45))
 	guard.rewards = [(Potion.medium, 1), (Potion.small, 1), (Item.torch, 1)]
 	guard.deadmsg = "You look at the dead guard."
-	guard.killedmsg = "The guard is dead, and you have a health of {0}. You also picked up 2 potions, a small one and a medium one. You continue to escape the dungeon. The halls are dark, so you grab a torch on your way out. As you escape, you are met by a man who stouts \"Follow me %s!\". You followed him." % (game.player.name)
+	guard.killedmsg = "The guard is dead, and you have a health of {0}. You also picked up 2 potions, a small one and a medium one. You continue to escape the dungeon. The halls are dark, so you grab a torch on your way out. As you escape, you are met by a man who shouts \"Follow me %s!\". You followed him." % (game.player.name)
 	guard.damagemsg = "You attacked the guard. The guard has a health of {0}, and you have a health of {1}."
 	guard.deathmsg = "You were beaten to death."
 	guard.ending = "Failed Escape"
@@ -2307,11 +2307,8 @@ def ext_southmine():
 		game.player.use_shield(game.current_enemy)
 	elif game.player.command in ["attack", "fight", "a"]:
 		game.player.attack_enemy(game.current_enemy)
-		if game.current_enemy.dead:
-			game.player.armor = game.player.armorbank
-		else:
-			game.player.maxhealth -= 2
-			print("Your max health is now %s." % (game.player.maxhealth))
+		game.player.maxhealth -= 2
+		print("Your max health is now %s." % (game.player.maxhealth))
 	elif game.player.command in ["walk", "run", "continue", "press forward", "move along", "follow ruffin", "follow"]:
 		if game.player.run_from_enemy(game.current_enemy, [40]):
 			southmine_1()
